@@ -7,12 +7,14 @@ from torch.nn import functional as F
 class Model(nn.Module):
     
     def __init__(self):
+        print('bella li')
         super().__init__()
-        oute = 64       # nb of channels in encoding layers
-        outd = 2*oute   # nb ofchannels in middle decoding layers
-        ChIm = 3        # input's nb of channels
-        kers = 3        # fixed kernel size for all convolutional layers
-        nb_elayers = 3  # number of encoding layers 
+        # Network structure params
+        oute = 64                                # nb of channels in encoding layers
+        outd = 2*oute                            # nb ofchannels in middle decoding layers
+        ChIm = 3                                 # input's nb of channels
+        kers = 3                                 # fixed kernel size for all convolutional layers
+        nb_elayers = 3                           # number of encoding layers 
             
         #ENCODER
         self.conv0 = nn.Conv2d(in_channels=ChIm, out_channels=oute, kernel_size=kers, padding='same')
@@ -27,6 +29,16 @@ class Model(nn.Module):
         self.dblocks = nn.ModuleList([dblock0] + [dblock1]*(nb_elayers-2) + [dblock2])
         
         self.conv2 = nn.Conv2d(in_channels=outd//3, out_channels=ChIm, kernel_size=kers, padding='same')
+
+        # Training params
+        # Must go after encoding/decoding, otherwiser self.parameters is empty
+        # and definition of optimizer is not allowed
+        self.criterion = nn.MSELoss()
+        self.batch_size = 500
+        self.optimizer = torch.optim.SGD(self.parameters(), lr=0.1, momentum=0.9)
+        self.scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(self.optimizer, 'min')
+        # Other params
+        self.do_print = True
 
     class _EncoderBlock(nn.Module):
         
@@ -62,17 +74,16 @@ class Model(nn.Module):
         #ENCODER
         pout = [x]
         y = self.conv0(x)
+
         for l in (self.eblocks[:-1]):
             y = l(y)
             pout.append(y)
         y = self.eblocks[-1](y)
         y = self.conv1(y)
-        
         #DECODER
         for i,l in enumerate(self.dblocks):
             y = l(y, pout[-(i+1)])
         y = self.conv2(y)
-        
         return y#y3
 
     # TODO: implement this structure
@@ -83,42 +94,66 @@ class Model(nn.Module):
         # same images, which only differs from the input by their noise.
 
 
-    def train(self, criterion, optimizer, train_input, train_target, batch_size):
+    def train(self, train_input, train_target, num_epochs):
+        if self.do_print: print('Training on {0} epochs:'.format(num_epochs))
+        self.training = True # Set training mode
+        for epoch in range(num_epochs):
 
-        self.train()
-        for inputs, targets in zip(train_input.split(batch_size), train_target.split(batch_size)):
-            output = self(inputs)
-            loss = criterion(output, targets)
+            if self.do_print: print(f'  epoch {epoch} running...', end='',flush=True)
+            for inputs, targets in zip(train_input.split(self.batch_size),\
+                                            train_target.split(self.batch_size)):
+                output = self.predict(inputs)
+                loss = self.criterion(output, targets)
 
-            optimizer.zero_grad()
-            loss.backward()
-            optimizer.step()
+                self.optimizer.zero_grad()
+                loss.backward()
+                self.optimizer.step()
+
+        self.training = False # Set evaluation mode
         return loss
 
-    def validate(self, criterion, val_input, val_target, batch_size):
+    def train_and_validate(self, train_input, train_target, num_epochs, val_input, val_target) -> None:
+        if self.do_print: print('Training on {0} epochs:'.format(num_epochs))
+        if self.do_print: print("Epoch:\t Tr_Err:\t  PSNR[dB]:")
+        for epoch in range(num_epochs):
+            loss=0
+            self.training = True # Set training mode
+            for inputs, targets in zip(train_input.split(self.batch_size),\
+                                            train_target.split(self.batch_size)):
+                output = self.predict(inputs)
+                loss = self.criterion(output, targets)
 
-        self.eval()
+                self.optimizer.zero_grad()
+                loss.backward()
+                self.optimizer.step()
+            mse, psnr = self.validate(val_input, val_target)
+            self.scheduler.step(mse)
+            if self.do_print: print("%d\t %.3f\t  %.3f"%(epoch, loss, psnr))
+        self.training = False # Set evaluation mode
+        
+
+
+
+    def validate(self, val_input, val_target):
+
+        self.training = False # evaluation mode
         with torch.no_grad():          
-            denoised = self(val_input)
+            denoised = self.predict(val_input)
             denoised = denoised/denoised.max()
 
             ground_truth = val_target
             ground_truth = ground_truth/ground_truth.max()
 
-            mse = criterion(denoised, ground_truth).item()
+            mse = self.criterion(denoised, ground_truth)
             psnr = -10 * torch.log10(mse + 10**-8)
         return mse, psnr
+
 
     def load_pretrained_model(self) -> None:
         ## This loads the parameters saved in bestmodel.pth into the model
         # TODO: implement
         pass
 
-    def predict(self, test_input) -> torch.Tensor:
-        #:test ̇input: tensor of size (N1, C, H, W) that has to be denoised by the trained or the loaded network.
-        #: returns a tensor of the size (N1, C, H, W)
-        pass
-    
     
 #y  = self.conv0(x)
 #y1 = self.eblocks[0](y)
