@@ -12,6 +12,16 @@ import argparse
 
 from Miniproject_1.model import Model
 
+# Print to file
+timestr = time.strftime("%Y%m%d-%H%M%S")
+filename=f'NetTest-{timestr}.txt'
+def myprint(string):
+    with open(filename, 'a') as file:
+        file.write('\n')
+        file.write(string)
+
+    # sys.stdout = f # Change the standard output to the file we created.
+
 def normalize_dataset(dataset):
     for d in dataset:
         mean = d.mean([-1,-2])
@@ -35,18 +45,15 @@ args = parser.parse_args()
 
 
 
-# Print to file
-timestr = time.strftime("%Y%m%d-%H%M%S")
-filename=f'NetTest-{timestr}.txt'
-f=open(filename, 'w')
-sys.stdout = f # Change the standard output to the file we created.
+
 
 # Print message
-print('########################################################')
-print('####################### Network test ###################')
-print('########################################################')
-print('')
-print('date & time: {0}'.format(time.strftime("%Y/%m/%d-%H:%M:%S")))
+with open(filename, 'a') as file:
+    file.write('########################################################'+'\n')
+    file.write('####################### Network test ###################'+'\n')
+    file.write('########################################################'+'\n')
+    file.write(''+'\n')
+    file.write('date & time: {0}'.format(time.strftime("%Y/%m/%d-%H:%M:%S"))+'\n')
 
 # Istantiate network
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -81,18 +88,18 @@ config_train={
 net.criterion  = config_train['criterion']
 net.batch_size = config_train['batch_size']
 
-
-print('')
-print('####################### Configuration ##################')
-print('')
-print('Net parameters:')
-for key,val in config_net.items():
-    print('-> ',key,' : ', val)
-print('')
-print('Training parameters:')
-for key,val in config_train.items():
-    print('-> ',key,' : ', val)
-print('')
+with open(filename, 'a') as file:
+    file.write(''+'\n')
+    file.write('####################### Configuration ##################'+'\n')
+    file.write(''+'\n')
+    file.write('Net parameters:'+'\n')
+    for key,val in config_net.items():
+        file.write('-> '+str(key)+' : '+str(val)+'\n')
+    file.write('')
+    file.write('Training parameters:'+'\n')
+    for key,val in config_train.items():
+        file.write('-> '+str(key)+' : '+str(val)+'\n')
+    file.write('')
 
 
 # Load dataset or portion of it
@@ -118,28 +125,29 @@ train_tg = normalize_dataset(train_target)
 
 
 # Training
-
-print('')
-print('####################### Training #######################')
-print('')
+with open(filename, 'a') as file:
+    file.write(''+'\n')
+    file.write('####################### Training #######################'+'\n')
+    file.write(''+'\n')
 train_start=time.time()
 
 # ########### The real training happens here ###############
 
 net.train_and_validate(train_in, train_tg, \
-    config_train['n_epochs'], valid_input, valid_target)
+    config_train['n_epochs'], valid_input, valid_target, filename)
 
-filename=args.param_file
-if filename is not None:
-    net.save(filename)
+# file_params=args.param_file
+# if filename is not None:
+#     net.save(file_params)
 
 
 train_end=time.time()
-print('')
-print('Time:')
-print('-> elapsed:\t{0:.1f} s'.format( train_end-train_start))
-print('-> per epoch:\t{0:.1f} s'.format( \
-    (train_end-train_start)/config_train['n_epochs']))
+with open(filename, 'a') as file:
+    file.write('\n')
+    file.write('Time:'+'\n')
+    file.write('-> elapsed:\t{0:.1f} s'.format( train_end-train_start)+'\n')
+    file.write('-> per epoch:\t{0:.1f} s'.format( \
+        (train_end-train_start)/config_train['n_epochs'])+'\n')
 
 
 
@@ -149,13 +157,14 @@ print('-> per epoch:\t{0:.1f} s'.format( \
 
 
 # Print source code
-print(print('\n' * 20))
-print('####################### Source code ####################')
-print('')
-source = open('Miniproject_1/model.py', 'r')
-content = source.read()
-print(content)
-source.close()
+with open(filename, 'a') as file:
+    file.write('\n' * 20)
+    file.write('####################### Source code ####################')
+    file.write('')
+    source = open('Miniproject_1/model.py', 'r')
+    content = source.read()
+    file.write(content)
+    source.close()
 
 
-f.close()
+# f.close()

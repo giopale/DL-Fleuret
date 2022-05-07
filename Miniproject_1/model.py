@@ -120,10 +120,13 @@ class Model(nn.Module):
         self.training = False # Set evaluation mode
         return loss
 
-    def train_and_validate(self, train_input, train_target, num_epochs, val_input, val_target) -> None:
-        if self.do_print: print('Training on {0} epochs:'.format(num_epochs))
-        if self.do_print: print("Epoch:\t Tr_Err:\t  PSNR[dB]:")
-        if self.do_print: print('')
+    def train_and_validate(self, train_input, train_target, num_epochs, val_input, val_target, filename=None) -> None:
+        if self.do_print: 
+            if filename is not None:
+                with open(filename, 'a') as file:
+                    file.write('Training on {0} epochs:'.format(num_epochs)+'\n')
+                    file.write("Epoch:\t Tr_Err:\t  PSNR[dB]:"+'\n')
+                    file.write(''+'\n')
 
         for epoch in range(num_epochs):
             loss=0
@@ -138,7 +141,9 @@ class Model(nn.Module):
                 self.optimizer.step()
             mse, psnr = self.validate(val_input, val_target)
             self.scheduler.step(mse)
-            if self.do_print: print("%d\t %.3f\t  %.3f"%(epoch, loss, psnr))
+            if filename is not None:
+                with open(filename, 'a') as file:
+                    file.write("%d\t %.3f\t  %.3f"%(epoch, loss, psnr)+'\n')
         self.training = False # Set evaluation mode
         
 
@@ -170,5 +175,5 @@ class Model(nn.Module):
     def load(self, filename) -> None:
         new_model = self.torch.load(filename)
         self=new_model
-        
+
 
