@@ -71,7 +71,7 @@ for key, val in config_net.items():
 
 config_train={
     # Training 
-    'n_train_samples' : 500 if args.train_samples is None else args.train_samples ,
+    'n_train_samples' : None if args.train_samples is None else args.train_samples ,
     'batch_size': 32 if args.batch_size is None else args.batch_size,
     'criterion': nn.MSELoss(),
     'n_epochs' : 5 if args.epochs is None else args.epochs,
@@ -101,10 +101,11 @@ valid_input, valid_target = torch.load('val_data.pkl',map_location=device)#valid
 train_input, train_target = torch.load('train_data.pkl',map_location=device) #test set (noise-noise)
 
 num_samples = config_train['n_train_samples']
-valid_input=torch.narrow(valid_input,0,0,num_samples)
-valid_target=torch.narrow(valid_target,0,0,num_samples)
-train_input=torch.narrow(train_input,0,0,num_samples)
-train_target=torch.narrow(train_target,0,0,num_samples)
+if num_samples is not None:
+    valid_input=torch.narrow(valid_input,0,0,num_samples)
+    valid_target=torch.narrow(valid_target,0,0,num_samples)
+    train_input=torch.narrow(train_input,0,0,num_samples)
+    train_target=torch.narrow(train_target,0,0,num_samples)
 
 train_in = normalize_dataset(train_input.float())
 train_tg = normalize_dataset(train_target.float())
