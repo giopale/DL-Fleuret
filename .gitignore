@@ -3,4 +3,5 @@
 **/val_data.pkl
 **/__pycache__
 **/run.sh
-
+**/err
+**/log
