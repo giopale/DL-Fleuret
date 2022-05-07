@@ -101,8 +101,8 @@ train_input, train_target = torch.load('train_data.pkl',map_location=device) #te
 
 num_samples = config_train['n_train_samples']
 if num_samples is not None:
-    valid_input  = valid_input[:num_samples]
-    valid_target = valid_target[:num_samples]
+    valid_input  = valid_input[:num_samples].float()
+    valid_target = valid_target[:num_samples].float()
     train_input  = train_input[:num_samples]
     train_target = train_target[:num_samples]
 
