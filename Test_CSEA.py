@@ -19,7 +19,15 @@ def normalize_dataset(dataset):
         norm(d)
     return dataset
 
-
+# Argument parsing
+parser = argparse.ArgumentParser()
+parser.add_argument('--train-samples', dest='train_samples',\
+                         type=int, help='Number of train samples to use')
+parser.add_argument('--batch-size', dest='batch_size',
+                         type=int, help='Batch size to use')
+parser.add_argument('--epochs', dest='epochs',
+                         type=int, help='Number of epochs')
+args = parser.parse_args()
 
 
 
@@ -60,26 +68,14 @@ for key, val in config_net.items():
 
 config_train={
     # Training 
-    'n_train_samples' : 10,
-    'batch_size': 10,
+    'n_train_samples' : 500 if args.train_samples is None else args.train_samples ,
+    'batch_size': 32 if args.batch_size is None else args.batch_size,
     'criterion': nn.MSELoss(),
-    'n_epochs' : 5,
+    'n_epochs' : 5 if args.epochs is None else args.epochs,
     # optimizer -> set from model.py
     # scheduler -> set form model.py
 
 }
-
-parser = argparse.ArgumentParser()
-parser.add_argument('--n_train_samples', dest='n_train_samples',\
-                         type=int, help='Number of train samples to use')
-parser.add_argument('--batch_size', dest='batch_size',
-                         type=int, help='Batch size to use')
-args = parser.parse_args()
-
-
-
-
-
 net.criterion=config_train['criterion']
 net.batch_size=config_train['batch_size']
 
