@@ -1,3 +1,4 @@
+from re import L
 import numpy as np
 import matplotlib.pyplot as plt
 import torch
@@ -27,6 +28,8 @@ parser.add_argument('--batch-size', dest='batch_size',
                          type=int, help='Batch size to use')
 parser.add_argument('--epochs', dest='epochs',
                          type=int, help='Number of epochs')
+parser.add_argument('--param-file', dest='param_file', type=str, \
+                help='Name of the file where parameters are saved')
 args = parser.parse_args()
 
 
@@ -119,6 +122,10 @@ train_start=time.time()
 
 net.train_and_validate(train_in, train_tg, \
     config_train['n_epochs'], valid_in, valid_tg)
+
+filename=args.param_file
+if filename is not None:
+    net.save(filename)
 
 
 
