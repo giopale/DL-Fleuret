@@ -17,6 +17,15 @@ def normalize_dataset(dataset):
         norm(d)
     return dataset
 
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--oute', dest='oute', type=float, help='Add oute')
+    parser.add_argument('--Njob', dest='Njob', type=float, help='Add Njob')
+    args = parser.parse_args()
+    oute = int(args.oute)
+
+
+
+
 
 # Print to file
 timestr = time.strftime("%Y%m%d-%H%M%S")
