@@ -2,3 +2,5 @@
 **/train_data.pkl
 **/val_data.pkl
 **/__pycache__
+**/run.sh
+
