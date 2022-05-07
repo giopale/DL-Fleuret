@@ -71,16 +71,15 @@ for key, val in config_net.items():
 
 config_train={
     # Training 
-    'n_train_samples' : None if args.train_samples is None else args.train_samples ,
+    'n_train_samples' : args.train_samples ,
     'batch_size': 32 if args.batch_size is None else args.batch_size,
     'criterion': nn.MSELoss(),
     'n_epochs' : 5 if args.epochs is None else args.epochs,
     # optimizer -> set from model.py
     # scheduler -> set form model.py
-
 }
-net.criterion=config_train['criterion']
-net.batch_size=config_train['batch_size']
+net.criterion  = config_train['criterion']
+net.batch_size = config_train['batch_size']
 
 
 print('')
@@ -102,15 +101,16 @@ train_input, train_target = torch.load('train_data.pkl',map_location=device) #te
 
 num_samples = config_train['n_train_samples']
 if num_samples is not None:
-    valid_input=torch.narrow(valid_input,0,0,num_samples)
-    valid_target=torch.narrow(valid_target,0,0,num_samples)
-    train_input=torch.narrow(train_input,0,0,num_samples)
-    train_target=torch.narrow(train_target,0,0,num_samples)
+    valid_input  = valid_input[:num_samples]
+    valid_target = valid_target[:num_samples]
+    train_input  = train_input[:num_samples]
+    train_target = train_target[:num_samples]
 
 train_in = normalize_dataset(train_input.float())
 train_tg = normalize_dataset(train_target.float())
-valid_in = normalize_dataset(valid_input.float())
-valid_tg = normalize_dataset(valid_target.float())
+
+
+
 
 # Training
 
@@ -122,12 +122,11 @@ train_start=time.time()
 # ########### The real training happens here ###############
 
 net.train_and_validate(train_in, train_tg, \
-    config_train['n_epochs'], valid_in, valid_tg)
+    config_train['n_epochs'], valid_input, valid_target)
 
 filename=args.param_file
 if filename is not None:
     net.save(filename)
-
 
 
 train_end=time.time()
