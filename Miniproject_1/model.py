@@ -154,10 +154,10 @@ class Model(nn.Module):
         self.training = False # evaluation mode
         with torch.no_grad():          
             denoised = self.predict(val_input)
-            denoised = denoised/denoised.max()
+            # denoised = denoised/denoised.max()
 
             ground_truth = val_target
-            ground_truth = ground_truth/ground_truth.max()
+            # ground_truth = ground_truth/ground_truth.max()
 
             mse = self.criterion(denoised, ground_truth)
             psnr = -10 * torch.log10(mse + 10**-8)
