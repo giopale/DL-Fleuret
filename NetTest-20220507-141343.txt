@@ -1,3 +1,64 @@
+########################################################
+####################### Network test ###################
+########################################################
+
+date & time: 2022/05/07-14:13:43
+Bella lì
+
+####################### Configuration ##################
+
+Net parameters:
+->  oute  :  64
+->  outd  :  128
+->  ChIm  :  3
+->  kers  :  3
+->  nb_elayers  :  3
+->  stride_maxpool  :  None
+
+Training parameters:
+->  n_train_samples  :  10
+->  batch_size  :  10
+->  criterion  :  MSELoss()
+->  n_epochs  :  5
+
+
+####################### Training #######################
+
+Training on 5 epochs:
+Epoch:	 Tr_Err:	  PSNR[dB]:
+0	 0.995	  13.929
+1	 0.976	  15.904
+2	 0.935	  18.756
+3	 0.830	  19.253
+4	 0.553	  19.095
+
+Time:
+-> elapsed:	1.6 s
+-> per epoch:	0.3 s
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+None
+####################### Source code ####################
+
 import torch
 import torchvision
 from torch import nn
@@ -159,3 +220,4 @@ class Model(nn.Module):
         ## This loads the parameters saved in bestmodel.pth into the model
         # TODO: implement
         pass
+
