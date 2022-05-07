@@ -99,15 +99,20 @@ print('')
 valid_input, valid_target = torch.load('val_data.pkl',map_location=device)#validation set (noise-clean)
 train_input, train_target = torch.load('train_data.pkl',map_location=device) #test set (noise-noise)
 
+valid_input = valid_input.float()/ 255.
+valid_target = valid_target.float() / 255.
+train_input = train_input.float()/ 255.
+train_target = train_target.float() / 255.
+
 num_samples = config_train['n_train_samples']
 if num_samples is not None:
-    valid_input  = valid_input[:num_samples].float()
-    valid_target = valid_target[:num_samples].float()
+    valid_input  = valid_input[:num_samples]
+    valid_target = valid_target[:num_samples]
     train_input  = train_input[:num_samples]
     train_target = train_target[:num_samples]
 
-train_in = normalize_dataset(train_input.float())
-train_tg = normalize_dataset(train_target.float())
+train_in = normalize_dataset(train_input)
+train_tg = normalize_dataset(train_target)
 
 
 
