@@ -163,3 +163,12 @@ class Model(nn.Module):
         ## This loads the parameters saved in bestmodel.pth into the model
         # TODO: implement
         pass
+
+    def save(self, filename) -> None:
+        torch.save(self.state_dict(), filename)
+
+    def load(self, filename) -> None:
+        new_model = self.torch.load(filename)
+        self=new_model
+        
+
