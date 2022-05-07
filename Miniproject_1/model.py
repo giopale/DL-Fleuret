@@ -101,7 +101,9 @@ class Model(nn.Module):
 
 
     def train(self, train_input, train_target, num_epochs):
-        if self.do_print: print('Training on {0} epochs:'.format(num_epochs))
+        if self.do_print: 
+            print('Training on {0} epochs:'.format(num_epochs))
+            print('')
         self.training = True # Set training mode
         for epoch in range(num_epochs):
 
@@ -121,6 +123,8 @@ class Model(nn.Module):
     def train_and_validate(self, train_input, train_target, num_epochs, val_input, val_target) -> None:
         if self.do_print: print('Training on {0} epochs:'.format(num_epochs))
         if self.do_print: print("Epoch:\t Tr_Err:\t  PSNR[dB]:")
+        if self.do_print: print('')
+
         for epoch in range(num_epochs):
             loss=0
             self.training = True # Set training mode
