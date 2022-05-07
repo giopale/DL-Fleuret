@@ -6,6 +6,8 @@ from torch import nn
 from torch.nn import functional as F
 import time
 import sys
+import argparse
+
 
 from Miniproject_1.model import Model
 
@@ -17,11 +19,6 @@ def normalize_dataset(dataset):
         norm(d)
     return dataset
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--oute', dest='oute', type=float, help='Add oute')
-    parser.add_argument('--Njob', dest='Njob', type=float, help='Add Njob')
-    args = parser.parse_args()
-    oute = int(args.oute)
 
 
 
@@ -45,6 +42,9 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 net = Model().to(device)
 
 #Configuration
+
+# Parse command arguments
+
 config_net={
     # Net params
     'oute' : 64,                                # nb of channels in encoding layers
@@ -68,6 +68,18 @@ config_train={
     # scheduler -> set form model.py
 
 }
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--n_train_samples', dest='n_train_samples',\
+                         type=int, help='Number of train samples to use')
+parser.add_argument('--batch_size', dest='batch_size',
+                         type=int, help='Batch size to use')
+args = parser.parse_args()
+
+
+
+
+
 net.criterion=config_train['criterion']
 net.batch_size=config_train['batch_size']
 
