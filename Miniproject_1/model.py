@@ -4,6 +4,19 @@ from torch import nn
 from torch.nn import functional as F
     
     
+def standardize_dataset(dataset, method='per_image'):
+    if dataset.dtype!=torch.float: dataset=dataset.float()
+    if method=='per_image':
+        mu  = dataset.mean((-1,-2)).view([*dataset.shape[:2],1,1])
+        std = dataset.std((-1, -2)).view([*dataset.shape[:2],1,1])
+        dataset.sub_(mu).div_(std)
+    else:
+        mu  = dataset.mean(0)
+        std = dataset.std(0)
+        dataset.sub_(mu).div_(std)
+    return 
+
+
 class Model(nn.Module):
 
 #==================================================================================================================#
@@ -11,7 +24,6 @@ class Model(nn.Module):
 #                                               NETWORK
 #==================================================================================================================#
 #==================================================================================================================#
-
 
     class _Encoder_Block(nn.Module):
         def __init__(self, in_channles, out_channels, conv_ksize, maxp_ksize):
@@ -50,7 +62,6 @@ class Model(nn.Module):
         #============================
         #       MODEL DEFS
         #============================
-
 
         oute = 64       # nb of channels in encoding layers
         outd = 2*oute   # nb ofchannels in middle decoding layers

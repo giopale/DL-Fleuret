@@ -22,16 +22,6 @@ def myprint(string):
 
     # sys.stdout = f # Change the standard output to the file we created.
 
-def normalize_dataset(dataset):
-    for d in dataset:
-        mean = d.mean([-1,-2])
-        std  = d.std([-1,-2])
-        norm = torchvision.transforms.Normalize(mean, std, inplace=True)
-        norm(d)
-    return dataset
-
-
-
 # Argument parsing
 parser = argparse.ArgumentParser()
 parser.add_argument('--train-samples', dest='train_samples', type=int, help='Number of train samples to use')
@@ -111,12 +101,6 @@ if num_samples is not None:
     train_input  = train_input[:num_samples]
     train_target = train_target[:num_samples]
 
-train_in = normalize_dataset(train_input)
-train_tg = normalize_dataset(train_target)
-
-
-
-
 # Training
 with open(filename, 'a') as file:
     file.write(''+'\n')
@@ -124,7 +108,7 @@ with open(filename, 'a') as file:
     file.write(''+'\n')
 
 t_train=time.time()
-net.train(train_in, train_tg, config_train['n_epochs'], valid_input, valid_target, filename)
+net.train(train_input, train_target, config_train['n_epochs'], valid_input, valid_target, filename)
 t_train=time.time()-t_train
 
 file_params=args.param_file
@@ -137,11 +121,6 @@ with open(filename, 'a') as file:
     file.write('Time:'+'\n')
     file.write('-> elapsed:\t{0:.1f} s'.format(t_train)+'\n')
     file.write('-> per epoch:\t{0:.1f} s'.format(t_train/config_train['n_epochs'])+'\n')
-
-
-
-
-
 
 
 
