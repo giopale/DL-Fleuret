@@ -136,9 +136,9 @@ train_start=time.time()
 net.train_and_validate(train_in, train_tg, \
     config_train['n_epochs'], valid_input, valid_target, filename)
 
-# file_params=args.param_file
-# if filename is not None:
-#     net.save(file_params)
+file_params=args.param_file
+if file_params is not None:
+    net.save(file_params)
 
 
 train_end=time.time()
