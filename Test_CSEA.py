@@ -21,6 +21,7 @@ def myprint(string):
         file.write(string)
 
     # sys.stdout = f # Change the standard output to the file we created.
+num_proc = multiprocessing.cpu_count()
 
 def normalize_dataset(dataset):
     for d in dataset:
@@ -50,6 +51,7 @@ with open(filename, 'a') as file:
     file.write('########################################################'+'\n')
     file.write(''+'\n')
     file.write('date & time: {0}'.format(time.strftime("%Y/%m/%d-%H:%M:%S"))+'\n')
+    file.write('running on {0} processors'.format(num_proc)+'\n')
 
 
 
