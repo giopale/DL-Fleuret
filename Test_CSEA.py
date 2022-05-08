@@ -30,19 +30,15 @@ def normalize_dataset(dataset):
         norm(d)
     return dataset
 
+
+
 # Argument parsing
 parser = argparse.ArgumentParser()
-parser.add_argument('--train-samples', dest='train_samples',\
-                         type=int, help='Number of train samples to use')
-parser.add_argument('--batch-size', dest='batch_size',
-                         type=int, help='Batch size to use')
-parser.add_argument('--epochs', dest='epochs',
-                         type=int, help='Number of epochs')
-parser.add_argument('--param-file', dest='param_file', type=str, \
-                help='Name of the file where parameters are saved')
+parser.add_argument('--train-samples', dest='train_samples', type=int, help='Number of train samples to use')
+parser.add_argument('--batch-size', dest='batch_size', type=int, help='Batch size to use')
+parser.add_argument('--epochs', dest='epochs', type=int, help='Number of epochs')
+parser.add_argument('--param-file', dest='param_file', type=str, help='Name of the file where parameters are saved')
 args = parser.parse_args()
-
-
 
 
 
@@ -55,33 +51,32 @@ with open(filename, 'a') as file:
     file.write(''+'\n')
     file.write('date & time: {0}'.format(time.strftime("%Y/%m/%d-%H:%M:%S"))+'\n')
 
+
+
 # Istantiate network
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 net = Model().to(device)
 
-#Configuration
 
+#Configuration
 # Parse command arguments
 
 config_net={
     # Net params
     'oute' : 64,                                # nb of channels in encoding layers
-    'outd' : 2*64,                            # nb ofchannels in middle decoding layers
+    'outd' : 2*64,                              # nb ofchannels in middle decoding layers
     'ChIm' : 3,                                 # input's nb of channels
     'kers' : 3,                                 # fixed kernel size for all convolutional layers
-    'nb_elayers' : 3,                           # number of encoding layers 
-    'stride_maxpool': None,                        # stride maxpooling layer
-
+    'nb_elayers' : 4,                           # number of encoding layers 
 }
-for key, val in config_net.items():
-    setattr(net,key,val)
+for key, val in config_net.items(): setattr(net,key,val)
 
 config_train={
     # Training 
-    'n_train_samples' : args.train_samples ,
+    'n_train_samples': args.train_samples ,
     'batch_size': 32 if args.batch_size is None else args.batch_size,
-    'criterion': nn.MSELoss(),
-    'n_epochs' : 5 if args.epochs is None else args.epochs,
+    'criterion' : nn.MSELoss(),
+    'n_epochs'  : 5 if args.epochs is None else args.epochs,
     # optimizer -> set from model.py
     # scheduler -> set form model.py
 }
@@ -106,15 +101,13 @@ with open(filename, 'a') as file:
 valid_input, valid_target = torch.load('val_data.pkl',map_location=device)#validation set (noise-clean)
 train_input, train_target = torch.load('train_data.pkl',map_location=device) #test set (noise-noise)
 
-valid_input = valid_input.float()/ 255.
-valid_target = valid_target.float() / 255.
-train_input = train_input.float()/ 255.
-train_target = train_target.float() / 255.
+valid_input  = valid_input.float() / 255.
+valid_target = valid_target.float()/ 255.
+train_input  = train_input.float() / 255.
+train_target = train_target.float()/ 255.
 
 num_samples = config_train['n_train_samples']
 if num_samples is not None:
-    valid_input  = valid_input[:num_samples]
-    valid_target = valid_target[:num_samples]
     train_input  = train_input[:num_samples]
     train_target = train_target[:num_samples]
 
@@ -129,25 +122,21 @@ with open(filename, 'a') as file:
     file.write(''+'\n')
     file.write('####################### Training #######################'+'\n')
     file.write(''+'\n')
-train_start=time.time()
 
-# ########### The real training happens here ###############
-
-net.train_and_validate(train_in, train_tg, \
-    config_train['n_epochs'], valid_input, valid_target, filename)
+t_train=time.time()
+net.train(train_in, train_tg, config_train['n_epochs'], valid_input, valid_target, filename)
+t_train=time.time()-t_train
 
 file_params=args.param_file
 if file_params is not None:
     net.save(file_params)
 
 
-train_end=time.time()
 with open(filename, 'a') as file:
     file.write('\n')
     file.write('Time:'+'\n')
-    file.write('-> elapsed:\t{0:.1f} s'.format( train_end-train_start)+'\n')
-    file.write('-> per epoch:\t{0:.1f} s'.format( \
-        (train_end-train_start)/config_train['n_epochs'])+'\n')
+    file.write('-> elapsed:\t{0:.1f} s'.format(t_train)+'\n')
+    file.write('-> per epoch:\t{0:.1f} s'.format(t_train/config_train['n_epochs'])+'\n')
 
 
 
