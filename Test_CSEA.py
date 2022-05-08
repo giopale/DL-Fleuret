@@ -8,6 +8,7 @@ from torch.nn import functional as F
 import time
 import sys
 import argparse
+import multiprocessing
 
 
 from Miniproject_1.model import Model
@@ -21,6 +22,7 @@ def myprint(string):
         file.write(string)
 
     # sys.stdout = f # Change the standard output to the file we created.
+num_proc = multiprocessing.cpu_count()
 
 # Argument parsing
 parser = argparse.ArgumentParser()
@@ -40,6 +42,7 @@ with open(filename, 'a') as file:
     file.write('########################################################'+'\n')
     file.write(''+'\n')
     file.write('date & time: {0}'.format(time.strftime("%Y/%m/%d-%H:%M:%S"))+'\n')
+    file.write('running on {0} processors'.format(num_proc)+'\n')
 
 
 

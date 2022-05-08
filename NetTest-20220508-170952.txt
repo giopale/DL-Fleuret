@@ -1,26 +1,73 @@
-from numpy import iinfo
-import torch
+########################################################
+####################### Network test ###################
+########################################################
+
+date & time: 2022/05/08-17:09:52
+
+####################### Configuration ##################
+
+Net parameters:
+-> oute : 64
+-> outd : 128
+-> ChIm : 3
+-> kers : 3
+-> nb_elayers : 4
+Training parameters:
+-> n_train_samples : 5000
+-> batch_size : 32
+-> criterion : MSELoss()
+-> n_epochs : 15
+
+####################### Training #######################
+
+Training on 15 epochs:
+Epoch:	 Tr_Err:	  PSNR[dB]:
+
+0	 0.690	  19.481
+1	 0.685	  21.381
+2	 0.684	  21.592
+3	 0.684	  21.893
+4	 0.683	  22.102
+5	 0.683	  22.288
+6	 0.683	  22.461
+7	 0.683	  22.605
+8	 0.683	  22.702
+9	 0.682	  22.769
+10	 0.682	  22.820
+11	 0.682	  22.855
+12	 0.682	  22.878
+13	 0.682	  22.896
+14	 0.682	  22.907
+
+Time:
+-> elapsed:	481.1 s
+-> per epoch:	32.1 s
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+####################### Source code ####################import torch
 import torchvision
 from torch import nn
 from torch.nn import functional as F
     
     
-def standardize_dataset(dataset, method='per_image'):
-    if dataset.dtype!=torch.float: dataset=dataset.float()
-    if method=='per_image':
-        mu  = dataset.mean((-1,-2)).view([*dataset.shape[:2],1,1])
-        std = dataset.std((-1, -2)).view([*dataset.shape[:2],1,1])
-        dataset.sub_(mu).div_(std)
-    else:
-        mu  = dataset.mean(0)
-        std = dataset.std(0)
-        dataset.sub_(mu).div_(std)
-    return 
-
-def _init_weights(model):
-    if isinstance(model,nn.Conv2d):
-        nn.init.kaiming_normal_(model.weight, mode='fan_in', nonlinearity='leaky_relu')
-
 class Model(nn.Module):
 
 #==================================================================================================================#
@@ -28,6 +75,7 @@ class Model(nn.Module):
 #                                               NETWORK
 #==================================================================================================================#
 #==================================================================================================================#
+
 
     class _Encoder_Block(nn.Module):
         def __init__(self, in_channles, out_channels, conv_ksize, maxp_ksize):
@@ -58,16 +106,15 @@ class Model(nn.Module):
             x = self.relu0(self.conv0(x)) #first convolution 
             x = self.relu1(self.conv1(x)) #second convlution
             return x
-
-
-
-
+            
+            
     def __init__(self):
         super().__init__()
 
         #============================
         #       MODEL DEFS
         #============================
+
 
         oute = 64       # nb of channels in encoding layers
         outd = 2*oute   # nb ofchannels in middle decoding layers
@@ -90,9 +137,6 @@ class Model(nn.Module):
         
         self.conv2 = nn.Conv2d(in_channels=outd//3, out_channels=ChIm, kernel_size=kers, padding='same')
         self.relu  = nn.PReLU() #nn.LeakyReLU(inplace=True)
-
-        #WEIGHTS INIT
-        self.apply(_init_weights)
         
 
         #============================
@@ -104,6 +148,7 @@ class Model(nn.Module):
         self.optimizer  = torch.optim.SGD(self.parameters(), lr=0.1, momentum=0.9, weight_decay=0.0005)
         self.scheduler  = torch.optim.lr_scheduler.ReduceLROnPlateau(self.optimizer, 'min')
         self.do_print   = True
+
 
     def predict(self, x):
         #ENCODER
