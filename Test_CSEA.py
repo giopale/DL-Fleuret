@@ -127,9 +127,9 @@ t_train=time.time()
 net.train(train_in, train_tg, config_train['n_epochs'], valid_input, valid_target, filename)
 t_train=time.time()-t_train
 
-# file_params=args.param_file
-# if filename is not None:
-#     net.save(file_params)
+file_params=args.param_file
+if file_params is not None:
+    net.save(file_params)
 
 
 with open(filename, 'a') as file:
