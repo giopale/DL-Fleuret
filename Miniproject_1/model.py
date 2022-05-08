@@ -60,8 +60,6 @@ class Model(nn.Module):
             return x
 
 
-
-
     def __init__(self):
         super().__init__()
 
@@ -142,9 +140,13 @@ class Model(nn.Module):
                     file.write('Training on {0} epochs:'.format(num_epochs)+'\n')
                     file.write("Epoch:\t Tr_Err:\t  PSNR[dB]:"+'\n\n')
 
+        #pre-process
+        train_input  = standardize_dataset(train_input , method='per_image')
+        train_target = standardize_dataset(train_target, method='per_image')
+        
+        #train
         for epoch in range(num_epochs):
-            for inputs, targets in zip(train_input.split(self.batch_size),\
-                                            train_target.split(self.batch_size)):
+            for inputs, targets in zip(train_input.split(self.batch_size), train_target.split(self.batch_size)):
                 output = self.predict(inputs)
                 loss   = self.criterion(output, targets)
 
