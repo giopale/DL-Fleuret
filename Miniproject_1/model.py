@@ -2,166 +2,161 @@ import torch
 import torchvision
 from torch import nn
 from torch.nn import functional as F
-
-
-class Model(nn.Module):
     
-    def __init__(self):
-        print('Bella lì')
-        super().__init__()
-        # Network structure params
-        oute = 64                                # nb of channels in encoding layers
-        outd = 2*oute                            # nb ofchannels in middle decoding layers
-        ChIm = 3                                 # input's nb of channels
-        kers = 3                                 # fixed kernel size for all convolutional layers
-        nb_elayers = 3                           # number of encoding layers 
-        stride_maxpool=None
-            
-        #ENCODER
-        self.conv0 = nn.Conv2d(in_channels=ChIm, out_channels=oute, kernel_size=kers, padding='same')
-        self.conv1 = nn.Conv2d(in_channels=oute, out_channels=oute, kernel_size=kers, padding='same')
-        eblock = self._EncoderBlock(in_channles=oute, out_channels=oute, conv_ksize=kers, \
-            maxp_ksize=2, stride_maxpool=stride_maxpool)
-        self.eblocks = nn.ModuleList([eblock]*nb_elayers)
-        
-        #DECODER
-        dblock0 = self._DecoderBlock(in0=2*oute, in1=outd, out1=outd, conv_ksize=kers)
-        dblock1 = self._DecoderBlock(in0=outd+oute, in1=outd, out1=outd, conv_ksize=kers)
-        dblock2 = self._DecoderBlock(in0=outd+ChIm, in1=outd//2, out1=outd//3, conv_ksize=kers)
-        self.dblocks = nn.ModuleList([dblock0] + [dblock1]*(nb_elayers-2) + [dblock2])
-        
-        self.conv2 = nn.Conv2d(in_channels=outd//3, out_channels=ChIm, kernel_size=kers, padding='same')
+    
+class Model(nn.Module):
 
-        # Training params
-        # Must go after encoding/decoding, otherwiser self.parameters is empty
-        # and definition of optimizer is not allowed
-        self.criterion = nn.MSELoss()
-        self.batch_size = 500
-        self.optimizer = torch.optim.SGD(self.parameters(), lr=0.1, momentum=0.9)
-        self.scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(self.optimizer, 'min')
-        # Other params
-        self.do_print = True
+#==================================================================================================================#
+#==================================================================================================================#
+#                                               NETWORK
+#==================================================================================================================#
+#==================================================================================================================#
 
-    class _EncoderBlock(nn.Module):
-        
-        def __init__(self, in_channles, out_channels, conv_ksize, maxp_ksize, stride_maxpool=None):
+
+    class _Encoder_Block(nn.Module):
+        def __init__(self, in_channles, out_channels, conv_ksize, maxp_ksize):
             super().__init__()
             self.conv = nn.Conv2d(in_channels=in_channles, out_channels=out_channels,\
-                                   kernel_size=conv_ksize, padding = 'same')
-
-            if stride_maxpool is None:
-                self.maxp = nn.MaxPool2d(kernel_size=maxp_ksize )
-            else:
-                self.maxp = nn.MaxPool2d(kernel_size=maxp_ksize,stride=stride_maxpool )
-
-
+                                kernel_size=conv_ksize, padding='same')
+            
+            self.maxp = nn.MaxPool2d(kernel_size=maxp_ksize)
+            self.relu = nn.PReLU(out_channels) #nn.LeakyReLU(inplace=True)
+            
         def forward(self, x):
-            x = F.leaky_relu(self.conv(x)) #convolution
-            x = self.maxp(x) #pooling
+            x = self.relu(self.conv(x)) #convolution
+            x = self.maxp(x)            #pooling 
             return x
     
     
-    class _DecoderBlock(nn.Module):
-        
+    class _Decoder_Block(nn.Module):
         def __init__(self, in0, in1, out1, conv_ksize):
             super().__init__()
             self.conv0 = nn.Conv2d(in_channels=in0, out_channels=in1 , kernel_size=conv_ksize, padding='same')
             self.conv1 = nn.Conv2d(in_channels=in1, out_channels=out1, kernel_size=conv_ksize, padding='same')
-
+            self.relu0 = nn.PReLU(in1) #nn.LeakyReLU(inplace=True)
+            self.relu1 = nn.PReLU(out1)
+            
         def forward(self, x, y):
             x = F.interpolate(x, scale_factor=2, mode='nearest') #upsample
-            x = torch.cat((x,y),dim=1) #concatenate
-            x = F.leaky_relu(self.conv0(x)) #first convolution 
-            x = F.leaky_relu(self.conv1(x)) #second convlution
+            x = torch.cat((x,y),dim=1)    #concatenate
+            x = self.relu0(self.conv0(x)) #first convolution 
+            x = self.relu1(self.conv1(x)) #second convlution
             return x
-    
+            
+            
+    def __init__(self):
+        super().__init__()
+
+        #============================
+        #       MODEL DEFS
+        #============================
+
+
+        oute = 64       # nb of channels in encoding layers
+        outd = 2*oute   # nb ofchannels in middle decoding layers
+        ChIm = 3        # input's nb of channels
+        kers = 3        # fixed kernel size for all convolutional layers
+        nb_elayers = 4  # number of encoding layers 
+            
+        #ENCODER
+        self.conv0 = nn.Conv2d(in_channels=ChIm, out_channels=oute, kernel_size=kers, padding='same')
+        self.conv1 = nn.Conv2d(in_channels=oute, out_channels=oute, kernel_size=kers, padding='same')
+        eblock = self._Encoder_Block(in_channles=oute, out_channels=oute, conv_ksize=kers, maxp_ksize=2)
+        self.eblocks = nn.ModuleList([eblock]*nb_elayers)
         
+        
+        #DECODER
+        dblock0 = self._Decoder_Block(in0=2*oute, in1=outd, out1=outd, conv_ksize=kers)
+        dblock1 = self._Decoder_Block(in0=outd+oute, in1=outd, out1=outd, conv_ksize=kers)
+        dblock2 = self._Decoder_Block(in0=outd+ChIm, in1=outd//2, out1=outd//3, conv_ksize=kers)
+        self.dblocks = nn.ModuleList([dblock0] + [dblock1]*(nb_elayers-2) + [dblock2])
+        
+        self.conv2 = nn.Conv2d(in_channels=outd//3, out_channels=ChIm, kernel_size=kers, padding='same')
+        self.relu  = nn.PReLU() #nn.LeakyReLU(inplace=True)
+        
+
+        #============================
+        #       TRAINING DEFS
+        #============================
+
+        self.criterion  = nn.MSELoss()
+        self.batch_size = 32
+        self.optimizer  = torch.optim.SGD(self.parameters(), lr=0.1, momentum=0.9, weight_decay=0.0005)
+        self.scheduler  = torch.optim.lr_scheduler.ReduceLROnPlateau(self.optimizer, 'min')
+        self.do_print   = True
+
+
     def predict(self, x):
         #ENCODER
         pout = [x]
-        y = self.conv0(x)
+        y = self.relu(self.conv0(x))
 
-        for l in (self.eblocks[:-1]):
+        for l in self.eblocks[:-1]:
             y = l(y)
             pout.append(y)
         y = self.eblocks[-1](y)
-        y = self.conv1(y)
+        y = self.relu(self.conv1(y))
+        
         #DECODER
         for i,l in enumerate(self.dblocks):
             y = l(y, pout[-(i+1)])
-        y = self.conv2(y)
-        return y#y3
-
-    # TODO: implement this structure
-    # def train(self, train ̇input, train ̇target, num ̇epochs) -> None:
-        # :train ̇input: tensor of size (N, C, H, W) containing a noisy version of the images
-        
-        #:train ̇target: tensor of size (N, C, H, W) containing another noisy version of the
-        # same images, which only differs from the input by their noise.
+        y = torch.sigmoid(self.conv2(y))
+        return y
 
 
-    def train(self, train_input, train_target, num_epochs):
-        if self.do_print: 
-            print('Training on {0} epochs:'.format(num_epochs))
-            print('')
-        self.training = True # Set training mode
-        for epoch in range(num_epochs):
 
-            if self.do_print: print(f'  epoch {epoch} running...', end='',flush=True)
-            for inputs, targets in zip(train_input.split(self.batch_size),\
-                                            train_target.split(self.batch_size)):
-                output = self.predict(inputs)
-                loss = self.criterion(output, targets)
+#==================================================================================================================#
+#==================================================================================================================#
+#                                               TRAINING
+#==================================================================================================================#
+#==================================================================================================================#
 
-                self.optimizer.zero_grad()
-                loss.backward()
-                self.optimizer.step()
 
-        self.training = False # Set evaluation mode
-        return loss
+    #============================
+    #           TRAIN
+    #============================
 
-    def train_and_validate(self, train_input, train_target, num_epochs, val_input, val_target, filename=None) -> None:
+    def train(self, train_input, train_target, num_epochs, val_input, val_target, filename=None) -> None:
         if self.do_print: 
             if filename is not None:
                 with open(filename, 'a') as file:
                     file.write('Training on {0} epochs:'.format(num_epochs)+'\n')
-                    file.write("Epoch:\t Tr_Err:\t  PSNR[dB]:"+'\n')
-                    file.write(''+'\n')
+                    file.write("Epoch:\t Tr_Err:\t  PSNR[dB]:"+'\n\n')
 
         for epoch in range(num_epochs):
-            loss=0
-            self.training = True # Set training mode
             for inputs, targets in zip(train_input.split(self.batch_size),\
                                             train_target.split(self.batch_size)):
                 output = self.predict(inputs)
-                loss = self.criterion(output, targets)
+                loss   = self.criterion(output, targets)
 
                 self.optimizer.zero_grad()
                 loss.backward()
                 self.optimizer.step()
+
             mse, psnr = self.validate(val_input, val_target)
             self.scheduler.step(mse)
+
             if filename is not None:
                 with open(filename, 'a') as file:
                     file.write("%d\t %.3f\t  %.3f"%(epoch, loss, psnr)+'\n')
-        self.training = False # Set evaluation mode
-        
 
-
+    #============================
+    #           VALIDATE                                            
+    #============================        
 
     def validate(self, val_input, val_target):
-
-        self.training = False # evaluation mode
         with torch.no_grad():          
             denoised = self.predict(val_input)
-            denoised = denoised/denoised.max()
-
-            ground_truth = val_target
-            ground_truth = ground_truth/ground_truth.max()
-
-            mse = self.criterion(denoised, ground_truth)
-            psnr = -10 * torch.log10(mse + 10**-8)
+            mse = F.mse_loss(denoised, val_target)
+            psnr = (-10 * torch.log10(mse + 10**-8)).item()
         return mse, psnr
+
+
+#==================================================================================================================#
+#==================================================================================================================#
+#                                               LOADERS
+#==================================================================================================================#
+#==================================================================================================================#
 
 
     def load_pretrained_model(self) -> None:
@@ -175,5 +170,3 @@ class Model(nn.Module):
     def load(self, filename) -> None:
         new_model = self.torch.load(filename)
         self=new_model
-
-
