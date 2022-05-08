@@ -1,9 +1,13 @@
+from numpy import iinfo
 import torch
 import torchvision
 from torch import nn
 from torch.nn import functional as F
     
-    
+def _init_weights(model):
+    if isinstance(model,nn.Conv2d):
+        nn.init.kaiming_normal_(model.weight, mode='fan_in', nonlinearity='leaky_relu')
+
 class Model(nn.Module):
 
 #==================================================================================================================#
@@ -42,8 +46,10 @@ class Model(nn.Module):
             x = self.relu0(self.conv0(x)) #first convolution 
             x = self.relu1(self.conv1(x)) #second convlution
             return x
-            
-            
+
+
+
+
     def __init__(self):
         super().__init__()
 
@@ -73,6 +79,9 @@ class Model(nn.Module):
         
         self.conv2 = nn.Conv2d(in_channels=outd//3, out_channels=ChIm, kernel_size=kers, padding='same')
         self.relu  = nn.PReLU() #nn.LeakyReLU(inplace=True)
+
+        #WEIGHTS INIT
+        self.apply(_init_weights)
         
 
         #============================
@@ -84,7 +93,6 @@ class Model(nn.Module):
         self.optimizer  = torch.optim.SGD(self.parameters(), lr=0.1, momentum=0.9, weight_decay=0.0005)
         self.scheduler  = torch.optim.lr_scheduler.ReduceLROnPlateau(self.optimizer, 'min')
         self.do_print   = True
-
 
     def predict(self, x):
         #ENCODER
