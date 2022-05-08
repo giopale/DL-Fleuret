@@ -141,8 +141,8 @@ class Model(nn.Module):
                     file.write("Epoch:\t Tr_Err:\t  PSNR[dB]:"+'\n\n')
 
         #pre-process
-        train_input  = standardize_dataset(train_input , method='per_image')
-        train_target = standardize_dataset(train_target, method='per_image')
+        standardize_dataset(train_input , method='per_image')
+        standardize_dataset(train_target, method='per_image')
         
         #train
         for epoch in range(num_epochs):
