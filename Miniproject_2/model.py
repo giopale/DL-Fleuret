@@ -49,7 +49,6 @@ class Sigmoid(Module):
     
     __call__ = forward
 
-
 class Sequential(Module):
     def __init__(self, **kwargs):
         super(Module, self).__init__()
@@ -76,14 +75,27 @@ class Sequential(Module):
 
     __call__ = forward
 
+class MSELoss(Module):
+    def __init__(self, *input):
+        super(Module,self).__init__()
+    
+    def forward(self,input,reference):
+        n=1
+        for i in input.size():
+            n=n*i
+        output = ((input-reference)**2).sum()/n
+        return output
+
+    __call__ = forward
+
 
 class Model():
     
     def __init__(self):
-        # do some stuff 
-        
+        # do some stuff     
         pass
 
+    
     
 
     
