@@ -20,3 +20,4 @@ I progetti sono contenuti nelle cartelle **Miniproject_1** e **Miniproject_2.**
 - provare **step size** e momentum
 - implementare ```load_pretrained_model```
 - trovare il modo di castare l'output a **INT**
+- Sistemare divisione per 255
