@@ -1,5 +1,6 @@
 # Miniproject 2
 
+import torch
 from torch import empty , cat , arange
 from torch.nn.functional import fold, unfold
 
