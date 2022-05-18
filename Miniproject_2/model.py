@@ -80,9 +80,7 @@ class MSELoss(Module):
         super(Module,self).__init__()
     
     def forward(self,input,reference):
-        n=1
-        for i in input.size():
-            n=n*i
+        n=input.size().numel()
         output = ((input-reference)**2).sum()/n
         return output
 
