@@ -89,27 +89,23 @@ class Module(object):
 
 
 class Relu(Module):
-    
     def __init__(self):
         super(Relu,self).__init__()
-        self.slope = 1.0
         return 
 
     def forward(self,input):
         self.input = input
-        output= self.slope *0.5 * (input + input.abs())
-        return output
+        return torch.relu(input)
     
     __call__ = forward
 
     def backward(self,dL_dy):
-        return dL_dy * (self.input > 0) * self.slope
+        return dL_dy * (self.input > 0)
 
 
 class Sigmoid(Module):
     def __init__(self):
         super(Sigmoid,self).__init__()
-        self.input = None
         return 
 
     def forward(self,input):
@@ -124,42 +120,10 @@ class Sigmoid(Module):
         return dL_dy*dsigma_dx
 
 
-
-class Sequential(Module):
-    def __init__(self, *args):
-        super(Sequential,self).__init__()
-        self._modules: Dict[str, Optional['Module']] = OrderedDict()
-
-        for idx, module in enumerate(args):
-            self.add_module(str(idx), module)
-            self.parameters.append(module.param())
-
-    def __str__(self):
-        to_print = '\n'
-        for key,val in self._modules.items():
-            to_print += key + '\n'
-        return to_print
-
-    def add_module(self, name, module):
-        self._modules[name] = module
-
-    def forward(self, input):
-        for module in self._modules.values():
-            input = module(input)
-        return input
-
-    __call__ = forward
-
-    def backward(self,x):
-        for module in reversed(self._modules.values()):
-            x = module.backward(x)
-           
-
 class MSELoss(Module):
     def __init__(self):
         super(MSELoss,self).__init__()
-        self.input = None
-        self.reference = None
+        self.reference : torch.Tensor
     
     def forward(self,input,reference):
         self.input     = input
@@ -171,6 +135,7 @@ class MSELoss(Module):
 
     def backward(self):
         return 2*(self.input - self.reference)/self.input.size().numel()
+
 
 class Conv2d(Module):
     def __init__(self, in_channels, out_channels, kernel_size, stride=1, padding=0, dilation=1):
@@ -239,6 +204,42 @@ class ConvTranspose2d(Module):
 
 
 
+class Sequential(Module):
+    def __init__(self, *args):
+        super(Sequential,self).__init__()
+        self._modules: Dict[str, Optional['Module']] = OrderedDict()
+
+        for idx, module in enumerate(args):
+            self.add_module(str(idx), module)
+            self.parameters.append(module.param())
+
+    def __str__(self):
+        to_print = '\n'
+        for key,val in self._modules.items():
+            to_print += key + '\n'
+        return to_print
+
+    def add_module(self, name, module):
+        self._modules[name] = module
+
+    def forward(self, input):
+        for module in self._modules.values():
+            input = module(input)
+        return input
+
+    __call__ = forward
+
+    def backward(self,x):
+        for module in reversed(self._modules.values()):
+            x = module.backward(x)
+           
+
+
+
+
+
+
+
 #===========================================================
 #                          MODEL                                            
 #===========================================================  
@@ -283,49 +284,3 @@ class Model():
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# ---------------------------------------------------------------------------------------------------
-#                                           NETWORK
-# ---------------------------------------------------------------------------------------------------
-
-class Model():
-    
-    def __init__(self):  
-        relu1 = Relu(name='name')
-        sig1 = Sigmoid(name='name')  
-        pass
-
-    
-    
-
-    
