@@ -258,7 +258,7 @@ class Sequential():
 
     def initialize(self):
         for module in self._modules.values():
-            _init_weights(module.weight)
+            _init_weights(module)
         return 
 
     def parameters(self):
