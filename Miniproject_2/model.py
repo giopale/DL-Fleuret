@@ -112,7 +112,7 @@ def conv_backward(input, dL_dy, weight, stride=1, padding=0, dilation=1):
 class Module(object):
     def __init__(self):
         self.parameters = []
-        self.input : torch.Tensor 
+        self.input = [] 
         pass
     def forward (self) :
         raise NotImplementedError
@@ -125,59 +125,41 @@ class Module(object):
 
 class ReLU(Module):
     def __init__(self):
-        super(ReLU,self).__init__()
+        super().__init__()
         return 
 
     def forward(self,input):
-        self.input = input
+        self.input.append(input)
         return torch.relu(input)
     
     __call__ = forward
 
     def backward(self,dL_dy):
-        return dL_dy * (self.input > 0)
+        return dL_dy * (self.input.pop() > 0)
 
 
 
 class Sigmoid(Module):
     def __init__(self):
-        super(Sigmoid,self).__init__()
+        super().__init__()
         return 
 
     def forward(self,input):
-        self.input = input
+        self.input.append(input)
         return torch.sigmoid(input)
     
     __call__ = forward
 
     def backward(self, dL_dy):
-        x = self.input
+        x = self.input.pop()
         dsigma_dx = torch.sigmoid(x)*(1.-torch.sigmoid(x))
         return dL_dy*dsigma_dx
 
 
 
-class MSE(Module):
-    def __init__(self):
-        super(MSE,self).__init__()
-        self.reference : torch.Tensor
-    
-    def forward(self,input,reference):
-        self.input     = input
-        self.reference = reference
-        output         = ((input-reference)**2).sum()/input.size().numel()
-        return output.item()
-
-    __call__ = forward
-
-    def backward(self):
-        return 2*(self.input - self.reference)/self.input.size().numel()
-
-
-
 class Conv2d(Module):
     def __init__(self, in_channels, out_channels, kernel_size, stride=1, padding=0, dilation=1, initialize=True):
-        super(Conv2d, self).__init__()
+        super().__init__()
         self.in_channels  = in_channels
         self.out_channels = out_channels
         self.kernel_size  = kernel_size
@@ -191,14 +173,13 @@ class Conv2d(Module):
         self.parameters = [self.weight, None]
         
     def forward(self, input):
-        self.input = input
+        self.input.append(input)
         return conv2d(input, self.weight, stride=self.stride, padding=self.padding, dilation=self.dilation)
     
     __call__ = forward
     
     def backward(self, dL_dy):
-        dL_dx, dL_df = conv_backward(self.input, dL_dy, self.weight, stride=self.stride,\
-                                     padding=self.padding, dilation=self.dilation)
+        dL_dx, dL_df = conv_backward(self.input.pop(), dL_dy, self.weight, stride=self.stride, padding=self.padding, dilation=self.dilation)
         self.parameters[1] = dL_df
         return dL_dx
     
@@ -206,7 +187,7 @@ class Conv2d(Module):
     
 class TransposeConv2d(Module):
     def __init__(self, in_channels, out_channels, kernel_size, stride=1, padding=0, dilation=1, initialize=True):
-        super(TransposeConv2d,self).__init__
+        super().__init__()
         self.in_channels  = in_channels
         self.out_channels = out_channels
         self.kernel_size  = kernel_size
@@ -220,9 +201,8 @@ class TransposeConv2d(Module):
         self.parameters = [self.weight, None]
         
     def forward(self, input):
-        self.input = input
-        return conv_transpose2d(input, self.weight, stride=self.stride,\
-                                padding=self.padding, dilation=self.dilation)
+        self.input.append(input)
+        return conv_transpose2d(input, self.weight, stride=self.stride, padding=self.padding, dilation=self.dilation)
     
     __call__ = forward
     
@@ -230,13 +210,32 @@ class TransposeConv2d(Module):
         p = self.kernel_size-1-self.padding
         z = self.stride-1
         
-        eff_input  = augment(self.input, nzeros=z, padding=p)
+        eff_input  = augment(self.input.pop(), nzeros=z, padding=p)
         eff_weight = self.weight.flip(2,3).transpose(0,1)
         dL_dx, dL_df = conv_backward(eff_input, dL_dy, eff_weight, stride=1, padding=0, dilation=1)
         
         dL_df = dL_df.flip(2,3).transpose(0,1)
         self.parameters[1] = dL_df
         return dL_dx[:,:,p:-p:z+1, p:-p:z+1]
+
+
+
+class MSE(Module):
+    def __init__(self):
+        super().__init__()
+        self.input : torch.Tensor
+        self.reference : torch.Tensor
+    
+    def forward(self,input,reference):
+        self.input     = input
+        self.reference = reference
+        output         = ((input-reference)**2).sum()/input.size().numel()
+        return output.item()
+
+    __call__ = forward
+
+    def backward(self):
+        return 2*(self.input - self.reference)/self.input.size().numel()
 
 
 
