@@ -87,6 +87,7 @@ class Module(object):
     def param (self) :
         return self.parameters
 
+
 class Relu(Module):
     slope=1.0
 
@@ -101,17 +102,25 @@ class Relu(Module):
     
     __call__ = forward
 
+
 class Sigmoid(Module):
     def __init__(self,*input):
         super(Sigmoid,self).__init__()
+        self.input = None
         return 
 
     def forward(self,input):
         self.input = input
-        output = 1 / (1 + (-input).exp())
-        return output
+        return torch.sigmoid(input)
     
     __call__ = forward
+
+    def backward(self, dL_dy):
+        x = self.input
+        dsigma_dx = torch.sigmoid(x)*(1.-torch.sigmoid(x))
+        return dL_dy*dsigma_dx
+
+
 
 class Sequential(Module):
     def __init__(self, *args):
