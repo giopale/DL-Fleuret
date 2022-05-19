@@ -239,7 +239,7 @@ class TransposeConv2d(Module):
 
 
 class Sequential():
-    def __init__(self, *args, initialize=False):
+    def __init__(self, *args, initialize=True):
         self._modules: Dict[str, Optional['Module']] = OrderedDict()
 
         for idx, module in enumerate(args):
