@@ -1,12 +1,44 @@
 # Miniproject 2
 
-import torch
+from email import generator
+import torch, math
 from collections import OrderedDict
 from typing import Dict, Optional
-from torch import empty , cat , arange
 from torch.nn.functional import fold, unfold
 
 torch.set_grad_enabled(False)
+
+
+
+def _calculate_fan_in_and_fan_out(tensor):
+    dimensions = tensor.dim()
+    assert dimensions >= 2
+
+    num_input_fmaps  = tensor.size(1)
+    num_output_fmaps = tensor.size(0)
+    receptive_field_size = 1
+    
+    if tensor.dim() > 2:
+        for s in tensor.shape[2:]:
+            receptive_field_size *= s
+    
+    fan_in  = num_input_fmaps * receptive_field_size
+    fan_out = num_output_fmaps * receptive_field_size
+
+    return fan_in, fan_out
+
+
+def xavier_normal_(tensor, gain=1):
+    fan_in, fan_out = _calculate_fan_in_and_fan_out(tensor)
+    std = gain * math.sqrt(2.0 / (fan_in + fan_out))
+    return tensor.normal_(0, std)
+
+
+def _init_weights(model):
+    if isinstance(model, Conv2d) or isinstance(model, TransposeConv2d):
+        model.weight.normal_(0,0.5,generator=torch.manual_seed(0))#xavier_normal_(model.weight)
+
+
 
 
 def conv2d(input, weight, stride=1, padding=0, dilation=1):
@@ -88,9 +120,10 @@ class Module(object):
         return self.parameters
 
 
-class Relu(Module):
+
+class ReLU(Module):
     def __init__(self):
-        super(Relu,self).__init__()
+        super(ReLU,self).__init__()
         return 
 
     def forward(self,input):
@@ -101,6 +134,7 @@ class Relu(Module):
 
     def backward(self,dL_dy):
         return dL_dy * (self.input > 0)
+
 
 
 class Sigmoid(Module):
@@ -120,9 +154,10 @@ class Sigmoid(Module):
         return dL_dy*dsigma_dx
 
 
-class MSELoss(Module):
+
+class MSE(Module):
     def __init__(self):
-        super(MSELoss,self).__init__()
+        super(MSE,self).__init__()
         self.reference : torch.Tensor
     
     def forward(self,input,reference):
@@ -137,8 +172,9 @@ class MSELoss(Module):
         return 2*(self.input - self.reference)/self.input.size().numel()
 
 
+
 class Conv2d(Module):
-    def __init__(self, in_channels, out_channels, kernel_size, stride=1, padding=0, dilation=1):
+    def __init__(self, in_channels, out_channels, kernel_size, stride=1, padding=0, dilation=1, initialize=True):
         super(Conv2d, self).__init__()
         self.in_channels  = in_channels
         self.out_channels = out_channels
@@ -148,7 +184,7 @@ class Conv2d(Module):
         self.dilation = dilation
 
         self.weight   = torch.Tensor(out_channels, in_channels, kernel_size, kernel_size)
-        self.weight.normal_()
+        if initialize: _init_weights(self.weight)
 
         self.parameters = [self.weight, None]
         
@@ -166,9 +202,9 @@ class Conv2d(Module):
     
     
     
-class ConvTranspose2d(Module):
-    def __init__(self, in_channels, out_channels, kernel_size, stride=1, padding=0, dilation=1):
-        super(ConvTranspose2d,self).__init__
+class TransposeConv2d(Module):
+    def __init__(self, in_channels, out_channels, kernel_size, stride=1, padding=0, dilation=1, initialize=True):
+        super(TransposeConv2d,self).__init__
         self.in_channels  = in_channels
         self.out_channels = out_channels
         self.kernel_size  = kernel_size
@@ -177,7 +213,7 @@ class ConvTranspose2d(Module):
         self.dilation = dilation
 
         self.weight   = torch.Tensor(in_channels, out_channels, kernel_size, kernel_size)
-        self.weight.normal_()
+        if initialize: _init_weights(self.weight)
 
         self.parameters = [self.weight, None]
         
@@ -202,16 +238,14 @@ class ConvTranspose2d(Module):
 
 
 
-
-
-class Sequential(Module):
-    def __init__(self, *args):
-        super(Sequential,self).__init__()
+class Sequential():
+    def __init__(self, *args, initialize=False):
         self._modules: Dict[str, Optional['Module']] = OrderedDict()
 
         for idx, module in enumerate(args):
             self.add_module(str(idx), module)
-            self.parameters.append(module.param())
+
+        if initialize: self.initialize()
 
     def __str__(self):
         to_print = '\n'
@@ -221,6 +255,15 @@ class Sequential(Module):
 
     def add_module(self, name, module):
         self._modules[name] = module
+
+    def initialize(self):
+        for module in self._modules.values():
+            _init_weights(module.weight)
+        return 
+
+    def parameters(self):
+        for module in self._modules.values():
+            yield module.parameters
 
     def forward(self, input):
         for module in self._modules.values():
@@ -249,7 +292,7 @@ class Model():
 
     def __init__(self) -> None:
 
-        self.criterion  = MSELoss()
+        self.criterion  = MSE()
         self.optimizer  = None
 
         self.stride     = 2
@@ -258,12 +301,12 @@ class Model():
 
         conv1 = Conv2d(3,self.features, kernel_size, stride=self.stride, padding=0, dilation=1)
         # conv1.weight=f
-        relu1 = Relu()
+        relu1 = ReLU()
         conv2 = Conv2d(5,self.features,kernel_size, stride=self.stride, padding=0, dilation=1)
-        relu2 = Relu()
-        tconv3 = ConvTranspose2d(5,self.features, kernel_size, stride=self.stride, padding=0, dilation=1)
-        relu3 = Relu()
-        tconv4 = ConvTranspose2d(5,self.features, kernel_size, stride=self.stride, padding=0, dilation=1)
+        relu2 = ReLU()
+        tconv3 = TransposeConv2d(5,self.features, kernel_size, stride=self.stride, padding=0, dilation=1)
+        relu3 = ReLU()
+        tconv4 = TransposeConv2d(5,self.features, kernel_size, stride=self.stride, padding=0, dilation=1)
         sig4 = Sigmoid() 
 
         self.net = Sequential(conv1,  
