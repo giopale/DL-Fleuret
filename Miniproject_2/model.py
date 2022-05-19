@@ -339,6 +339,7 @@ class Model():
 
     def train(self, train_input, train_target, num_epochs):
         for epoch in range(num_epochs):
+            print(f'Epoch {epoch}')
             for x, trg in zip(train_input.split(self.batch_size), train_target.split(self.batch_size)):
                 out = self.net(x)
                 _ = self.loss(out, trg)
