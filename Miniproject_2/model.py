@@ -84,7 +84,7 @@ class Module(object):
     def backward (self, *cose):
         raise NotImplementedError
     def param (self) :
-        return []
+        return self.parameters
 
 class Relu(Module):
     slope=1.0
@@ -117,6 +117,7 @@ class Sequential(Module):
 
         for idx, module in enumerate(args):
             self.add_module(str(idx), module)
+            self.parameters.append(module.param())
 
     def __str__(self):
         to_print = '\n'
@@ -133,6 +134,7 @@ class Sequential(Module):
         return input
 
     __call__ = forward
+           
 
 class MSELoss(Module):
     def __init__(self, *input):
@@ -164,6 +166,8 @@ class Conv2d(Module):
 
         self.weight   = torch.Tensor(out_channels, in_channels, kernel_size, kernel_size)
         self.weight.normal_()
+
+        self.parameters = [self.weight, None]
         
     def forward(self, input):
         return conv2d(input, self.weight, stride=self.stride, padding=self.padding, dilation=self.dilation)
@@ -173,7 +177,9 @@ class Conv2d(Module):
     def backward(self, input, dL_dy):
         dL_dx, dL_df = conv_backward(input, dL_dy, self.weight, stride=self.stride,\
                                      padding=self.padding, dilation=self.dilation)
+        self.parameters[1] = dL_df
         return dL_dx, dL_df
+    
     
     
 class ConvTranspose2d(Module):
@@ -188,6 +194,8 @@ class ConvTranspose2d(Module):
 
         self.weight   = torch.Tensor(in_channels, out_channels, kernel_size, kernel_size)
         self.weight.normal_()
+
+        self.parameters = [self.weight, None]
         
     def forward(self, input):
         return conv_transpose2d(input, self.weight, stride=self.stride,\
@@ -204,7 +212,55 @@ class ConvTranspose2d(Module):
         dL_dx, dL_df = conv_backward(eff_input, dL_dy, eff_weight, stride=1, padding=0, dilation=1)
         
         dL_df = dL_df.flip(2,3).transpose(0,1)
+        self.parameters[1] = dL_df
         return dL_dx[:,:,p:-p:z+1, p:-p:z+1], dL_df
+
+
+
+
+
+#===========================================================
+#                          MODEL                                            
+#===========================================================  
+
+
+class Model():
+
+    def __init__(self) -> None:
+
+        self.criterion  = MSELoss()
+        self.optimizer  = None
+
+        self.stride     = 2
+        kernel_size     = 2
+        self.features   = 5
+
+        conv1 = Conv2d(3,self.features, kernel_size, stride=self.stride, padding=0, dilation=1)
+        # conv1.weight=f
+        relu1 = Relu()
+        conv2 = Conv2d(5,self.features,kernel_size, stride=self.stride, padding=0, dilation=1)
+        relu2 = Relu()
+        tconv3 = ConvTranspose2d(5,self.features, kernel_size, stride=self.stride, padding=0, dilation=1)
+        relu3 = Relu()
+        tconv4 = ConvTranspose2d(5,self.features, kernel_size, stride=self.stride, padding=0, dilation=1)
+        sig4 = Sigmoid()
+
+        self.net = Sequential(conv1,  
+                        relu1,  
+                        conv2, 
+                        relu2, 
+                        tconv3,
+                        relu3, 
+                        tconv4,
+                        sig4
+                        )
+
+    def predict(self,x) -> torch.Tensor:
+        return self.net.forward(x)
+
+    def train(self, train_input, train_target):
+
+        pass
 
 
 
