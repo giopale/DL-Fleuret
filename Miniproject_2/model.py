@@ -95,6 +95,7 @@ class Relu(Module):
         return 
 
     def forward(self,input):
+        self.input = input
         output= self.slope *0.5 * (input + input.abs())
         return output
     
@@ -106,6 +107,7 @@ class Sigmoid(Module):
         return 
 
     def forward(self,input):
+        self.input = input
         output = 1 / (1 + (-input).exp())
         return output
     
@@ -176,6 +178,7 @@ class Conv2d(Module):
         self.parameters = [self.weight, None]
         
     def forward(self, input):
+        self.input = input
         return conv2d(input, self.weight, stride=self.stride, padding=self.padding, dilation=self.dilation)
     
     __call__ = forward
@@ -204,6 +207,7 @@ class ConvTranspose2d(Module):
         self.parameters = [self.weight, None]
         
     def forward(self, input):
+        self.input = input
         return conv_transpose2d(input, self.weight, stride=self.stride,\
                                 padding=self.padding, dilation=self.dilation)
     
