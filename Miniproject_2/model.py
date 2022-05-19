@@ -107,6 +107,7 @@ def conv_backward(input, dL_dy, weight, stride=1, padding=0, dilation=1):
 
 
 
+
 class Module(object):
     def __init__(self):
         self.parameters = []
@@ -264,6 +265,11 @@ class Sequential():
     def parameters(self):
         for module in self._modules.values():
             yield module.parameters
+    
+    def zero_grad(self):
+        for module in self._modules.values():
+            if module.parameters:
+                module.parameters[1] = 0
 
     def forward(self, input):
         for module in self._modules.values():
@@ -296,17 +302,24 @@ class Model():
         self.optimizer  = None
 
         self.stride     = 2
-        kernel_size     = 2
+        self.kernel_size     = 2
         self.features   = 5
 
-        conv1 = Conv2d(3,self.features, kernel_size, stride=self.stride, padding=0, dilation=1)
+        self.eta        = 0.1
+        self.gamma      = 0.5
+        self.params_old   = None
+        self.batch_size = 2
+
+        
+
+        conv1 = Conv2d(3,self.features, self.kernel_size, stride=self.stride, padding=0, dilation=1)
         # conv1.weight=f
         relu1 = ReLU()
-        conv2 = Conv2d(5,self.features,kernel_size, stride=self.stride, padding=0, dilation=1)
+        conv2 = Conv2d(5,self.features,self.kernel_size, stride=self.stride, padding=0, dilation=1)
         relu2 = ReLU()
-        tconv3 = TransposeConv2d(5,self.features, kernel_size, stride=self.stride, padding=0, dilation=1)
+        tconv3 = TransposeConv2d(5,self.features, self.kernel_size, stride=self.stride, padding=0, dilation=1)
         relu3 = ReLU()
-        tconv4 = TransposeConv2d(5,self.features, kernel_size, stride=self.stride, padding=0, dilation=1)
+        tconv4 = TransposeConv2d(self.features,3, self.kernel_size, stride=self.stride, padding=0, dilation=1)
         sig4 = Sigmoid() 
 
         self.net = Sequential(conv1,  
@@ -322,8 +335,24 @@ class Model():
     def predict(self,x) -> torch.Tensor:
         return self.net.forward(x)
 
-    def train(self, train_input, train_target):
+    def train(self, train_input, train_target, num_epochs):
+        for epoch in range(num_epochs):
+            for x, trg in zip(train_input.split(self.batch_size), train_target.split(self.batch_size)):
+                out = self.net(x)
+                loss  = MSE()
+                l_val = loss(out, trg)
+
+                self.net.zero_grad()
+                self.net.backward(loss.backward())
+                self.SGD()
+
+
         pass
 
-
+    def SGD(self):
+        for p in self.net.parameters():
+            if p:
+                p[0] = p[0] - self.eta * p[1]
+        self.params_old = self.net.parameters
+                
 
