@@ -137,13 +137,20 @@ class Sequential(Module):
 class MSELoss(Module):
     def __init__(self, *input):
         super(MSELoss,self).__init__()
+        self.input = None
+        self.reference = None
     
     def forward(self,input,reference):
-        n=input.size().numel()
-        output = ((input-reference)**2).sum()/n
+        self.input     = input
+        self.reference = reference
+        n              = input.size().numel()
+        output         = ((input-reference)**2).sum()/n
         return output
 
     __call__ = forward
+
+    def backward(self):
+        return 2*(self.input - self.reference)/self.input.size().numel()
 
 class Conv2d(Module):
     def __init__(self, in_channels, out_channels, kernel_size, stride=1, padding=0, dilation=1):
