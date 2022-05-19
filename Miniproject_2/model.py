@@ -89,10 +89,10 @@ class Module(object):
 
 
 class Relu(Module):
-    slope=1.0
-
-    def __init__(self,*input):
+    
+    def __init__(self):
         super(Relu,self).__init__()
+        self.slope = 1.0
         return 
 
     def forward(self,input):
@@ -102,9 +102,12 @@ class Relu(Module):
     
     __call__ = forward
 
+    def backward(self,dL_dy):
+        return dL_dy * (self.input > 0) * self.slope
+
 
 class Sigmoid(Module):
-    def __init__(self,*input):
+    def __init__(self):
         super(Sigmoid,self).__init__()
         self.input = None
         return 
@@ -141,20 +144,19 @@ class Sequential(Module):
         self._modules[name] = module
 
     def forward(self, input):
-        for _ , module in self._modules.items():
+        for module in self._modules.values():
             input = module(input)
         return input
 
     __call__ = forward
 
     def backward(self,x):
-        for module in self._modules:
-            pass
-
+        for module in reversed(self._modules.values()):
+            x = module.backward(x)
            
 
 class MSELoss(Module):
-    def __init__(self, *input):
+    def __init__(self):
         super(MSELoss,self).__init__()
         self.input = None
         self.reference = None
@@ -162,9 +164,8 @@ class MSELoss(Module):
     def forward(self,input,reference):
         self.input     = input
         self.reference = reference
-        n              = input.size().numel()
-        output         = ((input-reference)**2).sum()/n
-        return output
+        output         = ((input-reference)**2).sum()/input.size().numel()
+        return output.item()
 
     __call__ = forward
 
@@ -192,11 +193,11 @@ class Conv2d(Module):
     
     __call__ = forward
     
-    def backward(self, input, dL_dy):
-        dL_dx, dL_df = conv_backward(input, dL_dy, self.weight, stride=self.stride,\
+    def backward(self, dL_dy):
+        dL_dx, dL_df = conv_backward(self.input, dL_dy, self.weight, stride=self.stride,\
                                      padding=self.padding, dilation=self.dilation)
         self.parameters[1] = dL_df
-        return dL_dx, dL_df
+        return dL_dx
     
     
     
@@ -222,17 +223,17 @@ class ConvTranspose2d(Module):
     
     __call__ = forward
     
-    def backward(self, input, dL_dy):
+    def backward(self, dL_dy):
         p = self.kernel_size-1-self.padding
         z = self.stride-1
         
-        eff_input  = augment(input, nzeros=z, padding=p)
+        eff_input  = augment(self.input, nzeros=z, padding=p)
         eff_weight = self.weight.flip(2,3).transpose(0,1)
         dL_dx, dL_df = conv_backward(eff_input, dL_dy, eff_weight, stride=1, padding=0, dilation=1)
         
         dL_df = dL_df.flip(2,3).transpose(0,1)
         self.parameters[1] = dL_df
-        return dL_dx[:,:,p:-p:z+1, p:-p:z+1], dL_df
+        return dL_dx[:,:,p:-p:z+1, p:-p:z+1]
 
 
 
