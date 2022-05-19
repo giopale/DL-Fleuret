@@ -78,10 +78,11 @@ def conv_backward(input, dL_dy, weight, stride=1, padding=0, dilation=1):
 class Module(object):
     def __init__(self):
         self.parameters = []
+        self.input : torch.Tensor 
         pass
-    def forward (self,*input) :
+    def forward (self) :
         raise NotImplementedError
-    def backward (self, *cose):
+    def backward (self, input):
         raise NotImplementedError
     def param (self) :
         return self.parameters
@@ -134,6 +135,11 @@ class Sequential(Module):
         return input
 
     __call__ = forward
+
+    def backward(self,x):
+        for module in self._modules:
+            pass
+
            
 
 class MSELoss(Module):
@@ -243,7 +249,7 @@ class Model():
         tconv3 = ConvTranspose2d(5,self.features, kernel_size, stride=self.stride, padding=0, dilation=1)
         relu3 = Relu()
         tconv4 = ConvTranspose2d(5,self.features, kernel_size, stride=self.stride, padding=0, dilation=1)
-        sig4 = Sigmoid()
+        sig4 = Sigmoid() 
 
         self.net = Sequential(conv1,  
                         relu1,  
@@ -259,7 +265,6 @@ class Model():
         return self.net.forward(x)
 
     def train(self, train_input, train_target):
-
         pass
 
 
