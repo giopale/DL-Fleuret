@@ -5,6 +5,7 @@ import torch, math
 from collections import OrderedDict
 from typing import Dict, Optional
 from torch.nn.functional import fold, unfold
+import copy
 
 torch.set_grad_enabled(False)
 
@@ -305,10 +306,12 @@ class Model():
         self.kernel_size     = 2
         self.features   = 5
 
+        self.loss = MSE()
+
         self.eta        = 0.1
         self.gamma      = 0.5
         self.params_old   = None
-        self.batch_size = 2
+        self.batch_size = 32
 
         
 
@@ -339,20 +342,23 @@ class Model():
         for epoch in range(num_epochs):
             for x, trg in zip(train_input.split(self.batch_size), train_target.split(self.batch_size)):
                 out = self.net(x)
-                loss  = MSE()
-                l_val = loss(out, trg)
+                _ = self.loss(out, trg)
 
                 self.net.zero_grad()
-                self.net.backward(loss.backward())
+                self.net.backward(self.loss.backward())
                 self.SGD()
 
 
         pass
 
     def SGD(self):
-        for p in self.net.parameters():
+        for idx, p in enumerate(self.net.parameters()):
             if p:
-                p[0] = p[0] - self.eta * p[1]
-        self.params_old = self.net.parameters
+                if self.params_old is not None:
+                    grad = self.gamma * self.params_old[idx][1] + self.eta * p[1] 
+                else:
+                    grad = self.eta * p[1]
+                p[0] = p[0] - grad
+        self.params_old = copy.deepcopy(list(self.net.parameters()))
                 
 
