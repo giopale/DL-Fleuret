@@ -314,9 +314,9 @@ class Model():
         conv1 = Conv2d(3,self.features, self.kernel_size, stride=self.stride, padding=0, dilation=1)
         # conv1.weight=f
         relu1 = ReLU()
-        conv2 = Conv2d(5,self.features,self.kernel_size, stride=self.stride, padding=0, dilation=1)
+        conv2 = Conv2d(self.features,self.features,self.kernel_size, stride=self.stride, padding=0, dilation=1)
         relu2 = ReLU()
-        tconv3 = TransposeConv2d(5,self.features, self.kernel_size, stride=self.stride, padding=0, dilation=1)
+        tconv3 = TransposeConv2d(self.features,self.features, self.kernel_size, stride=self.stride, padding=0, dilation=1)
         relu3 = ReLU()
         tconv4 = TransposeConv2d(self.features,3, self.kernel_size, stride=self.stride, padding=0, dilation=1)
         sig4 = Sigmoid() 
@@ -330,6 +330,7 @@ class Model():
                         tconv4,
                         sig4
                         )
+        self.net._initialize()
 
     def predict(self,x) -> torch.Tensor:
         return self.net.forward(x)
