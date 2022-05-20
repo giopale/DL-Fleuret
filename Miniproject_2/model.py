@@ -239,11 +239,11 @@ class Sequential():
         self._modules: Dict[str, Optional['Module']] = OrderedDict()
 
         for idx, module in enumerate(args):
-            self.add_module(str(idx), module)
+            self._add_module(str(idx), module)
 
         self._nb_modules = len(args)
         self._inputs = [None]* self._nb_modules
-        if initialize: self.initialize()
+        if initialize: self._initialize()
 
     def __str__(self):
         to_print = '\n'
@@ -251,10 +251,10 @@ class Sequential():
             to_print += key + '\n'
         return to_print
 
-    def add_module(self, name, module):
+    def _add_module(self, name, module):
         self._modules[name] = module
 
-    def initialize(self):
+    def _initialize(self):
         for module in self._modules.values():
             _init_weights(module)
         return 
@@ -335,19 +335,37 @@ class Model():
     def predict(self,x) -> torch.Tensor:
         return self.net.forward(x)
 
-    def train(self, train_input, train_target, num_epochs):
-        for epoch in range(num_epochs):
-            print(f'Epoch {epoch}')
-            for x, trg in zip(train_input.split(self.batch_size), train_target.split(self.batch_size)):
-                out = self.net(x)
-                _ = self.loss(out, trg)
+
+    def train(self, train_input, train_target, nb_epochs):
+        for e in range(nb_epochs):
+            for inputs, targets in zip(train_input.split(self.batch_size), train_target.split(self.batch_size)):
+                output = self.net(inputs)
+                _ = self.loss(output, targets)
 
                 self.net.zero_grad()
                 self.net.backward(self.loss.backward())
-                self.SGD()
+                
+                for p in self.net.parameters(): 
+                    if p : p[0] -= self.eta * p[1]
+            print("\rCompleted: %d/%d"%(e+1,nb_epochs), end=' ')
+        return 
 
 
-        pass
+
+
+
+    # def train(self, train_input, train_target, num_epochs):
+    #     for epoch in range(num_epochs):
+    #         print(f'Epoch {epoch}')
+    #         for x, trg in zip(train_input.split(self.batch_size), train_target.split(self.batch_size)):
+    #             out = self.net(x)
+    #             _ = self.loss(out, trg)
+
+    #             self.net.zero_grad()
+    #             self.net.backward(self.loss.backward())
+    #             self.SGD()
+
+    
 
     def SGD(self):
         for idx, p in enumerate(self.net.parameters()):
