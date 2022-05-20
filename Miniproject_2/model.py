@@ -296,19 +296,18 @@ class Model():
 
     def __init__(self) -> None:
 
-        self.criterion  = MSE()
-        self.optimizer  = None
-
-        self.stride     = 2
-        self.kernel_size     = 2
-        self.features   = 5
+        self.criterion   = MSE()
+        self.optimizer   = None
+        self.stride      = 2
+        self.kernel_size = 2
+        self.features    = 32
 
         self.loss = MSE()
 
-        self.eta        = 0.1
-        self.gamma      = 0.5
-        self.params_old   = None
-        self.batch_size = 32
+        self.eta         = 0.1
+        self.gamma       = 0.5
+        self.params_old  = None
+        self.batch_size  = 32
 
         
 
@@ -363,9 +362,9 @@ class Model():
 
     #             self.net.zero_grad()
     #             self.net.backward(self.loss.backward())
-    #             self.SGD()
 
-    
+
+    #             self.SGD()    
 
     def SGD(self):
         for idx, p in enumerate(self.net.parameters()):
