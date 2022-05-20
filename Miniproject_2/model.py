@@ -332,27 +332,12 @@ class Model():
                 self.net.zero_grad()
                 self.net.backward(self.loss.backward())
                 
-                for p in self.net.parameters(): 
-                    if p : p[0] -= self.eta * p[1]
+                # for p in self.net.parameters(): 
+                #     if p : p[0] -= self.eta * p[1]
+
+                self.SGD()
             print("\rCompleted: %d/%d"%(e+1,nb_epochs), end=' ')
         return 
-
-
-
-
-
-    # def train(self, train_input, train_target, num_epochs):
-    #     for epoch in range(num_epochs):
-    #         print(f'Epoch {epoch}')
-    #         for x, trg in zip(train_input.split(self.batch_size), train_target.split(self.batch_size)):
-    #             out = self.net(x)
-    #             _ = self.loss(out, trg)
-
-    #             self.net.zero_grad()
-    #             self.net.backward(self.loss.backward())
-
-
-    #             self.SGD()    
 
     def SGD(self):
         for idx, p in enumerate(self.net.parameters()):
