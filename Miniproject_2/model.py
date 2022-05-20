@@ -311,6 +311,18 @@ class Model():
 
         
 
+        my_conv1 = Conv2d(in_channels=3, out_channels=self.features, stride=self.stride,  kernel_size=self.kernel_size)
+        my_conv2 = Conv2d(in_channels=self.features, out_channels=self.features, stride=self.stride,  kernel_size=self.kernel_size)
+
+
+        my_tconv1 = TransposeConv2d(in_channels=self.features, out_channels=self.features,  stride=self.stride,  kernel_size=self.kernel_size, padding=0, dilation=1)
+        my_tconv2 = TransposeConv2d(in_channels=self.features, out_channels=3,  stride=self.stride,  kernel_size=self.kernel_size, padding=0, dilation=1)
+
+        my_relu = ReLU()
+        my_sigmoid = Sigmoid()
+
+        self.net = Sequential(my_conv1, my_relu, my_conv2, my_relu, my_tconv1, my_relu, my_tconv2, my_sigmoid, initialize=True)
+
         conv1 = Conv2d(3,self.features, self.kernel_size, stride=self.stride, padding=0, dilation=1)
         # conv1.weight=f
         relu1 = ReLU()
