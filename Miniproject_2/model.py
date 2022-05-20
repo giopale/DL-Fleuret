@@ -129,13 +129,12 @@ class ReLU(Module):
         return 
 
     def forward(self,input):
-        self.input.append(input)
         return torch.relu(input)
     
     __call__ = forward
 
-    def backward(self,dL_dy):
-        return dL_dy * (self.input.pop() > 0)
+    def backward(self, input, dL_dy):
+        return dL_dy * (input > 0)
 
 
 
@@ -145,14 +144,12 @@ class Sigmoid(Module):
         return 
 
     def forward(self,input):
-        self.input.append(input)
         return torch.sigmoid(input)
     
     __call__ = forward
 
-    def backward(self, dL_dy):
-        x = self.input.pop()
-        dsigma_dx = torch.sigmoid(x)*(1.-torch.sigmoid(x))
+    def backward(self, input, dL_dy):
+        dsigma_dx = torch.sigmoid(input)*(1.-torch.sigmoid(input))
         return dL_dy*dsigma_dx
 
 
@@ -173,13 +170,12 @@ class Conv2d(Module):
         self.parameters = [self.weight, None]
         
     def forward(self, input):
-        self.input.append(input)
         return conv2d(input, self.weight, stride=self.stride, padding=self.padding, dilation=self.dilation)
     
     __call__ = forward
     
-    def backward(self, dL_dy):
-        dL_dx, dL_df = conv_backward(self.input.pop(), dL_dy, self.weight, stride=self.stride, padding=self.padding, dilation=self.dilation)
+    def backward(self, input, dL_dy):
+        dL_dx, dL_df = conv_backward(input, dL_dy, self.weight, stride=self.stride, padding=self.padding, dilation=self.dilation)
         self.parameters[1] = dL_df
         return dL_dx
     
@@ -201,16 +197,15 @@ class TransposeConv2d(Module):
         self.parameters = [self.weight, None]
         
     def forward(self, input):
-        self.input.append(input)
         return conv_transpose2d(input, self.weight, stride=self.stride, padding=self.padding, dilation=self.dilation)
     
     __call__ = forward
     
-    def backward(self, dL_dy):
+    def backward(self, input, dL_dy):
         p = self.kernel_size-1-self.padding
         z = self.stride-1
         
-        eff_input  = augment(self.input.pop(), nzeros=z, padding=p)
+        eff_input  = augment(input, nzeros=z, padding=p)
         eff_weight = self.weight.flip(2,3).transpose(0,1)
         dL_dx, dL_df = conv_backward(eff_input, dL_dy, eff_weight, stride=1, padding=0, dilation=1)
         
@@ -246,6 +241,8 @@ class Sequential():
         for idx, module in enumerate(args):
             self.add_module(str(idx), module)
 
+        self._nb_modules = len(args)
+        self._inputs = [None]* self._nb_modules
         if initialize: self.initialize()
 
     def __str__(self):
@@ -272,15 +269,16 @@ class Sequential():
                 module.parameters[1] = 0
 
     def forward(self, input):
-        for module in self._modules.values():
+        for i, module in enumerate(self._modules.values()):
+            self._inputs[i] = input
             input = module(input)
         return input
 
     __call__ = forward
 
     def backward(self,x):
-        for module in reversed(self._modules.values()):
-            x = module.backward(x)
+        for i, module in enumerate(reversed(self._modules.values())):
+            x = module.backward(self._inputs[-(i+1)], x)
            
 
 
