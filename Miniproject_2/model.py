@@ -29,7 +29,7 @@ def _calculate_fan_in_and_fan_out(tensor):
     return fan_in, fan_out
 
 
-def xavier_normal_(tensor, gain=1):
+def xavier_normal_(tensor, gain=1.4142135623730951):
     fan_in, fan_out = _calculate_fan_in_and_fan_out(tensor)
     std = gain * math.sqrt(2.0 / (fan_in + fan_out))
     return tensor.normal_(0, std)
@@ -37,8 +37,7 @@ def xavier_normal_(tensor, gain=1):
 
 def _init_weights(model):
     if isinstance(model, Conv2d) or isinstance(model, TransposeConv2d):
-        xavier_normal_(model.weight) #model.weight.normal_(0,0.5,generator=torch.manual_seed(0))
-
+        xavier_normal_(model.weight) # model.weight.normal_(0,0.5,generator=torch.manual_seed(0)) #
 
 
 
@@ -104,15 +103,15 @@ def conv_backward(input, dL_dy, weight, stride=1, padding=0, dilation=1):
             dL_df[alpha] += conv2d(xx, dLdy)[0]
 
     dL_df.transpose_(0,1)
-    return dL_dx, dL_df
+    return (dL_dx, dL_df)
 
 
 
 
 class Module(object):
     def __init__(self):
-        self.parameters = []
-        self.input = [] 
+        self.weight   = torch.Tensor([])
+        self.d_weight = torch.Tensor([])
         pass
     def forward (self) :
         raise NotImplementedError
@@ -122,20 +121,19 @@ class Module(object):
         return self.parameters
 
 
-
 class ReLU(Module):
     def __init__(self):
         super().__init__()
         return 
 
-    def forward(self,input):
+    def forward(self, input):
         return torch.relu(input)
-    
     __call__ = forward
 
-    def backward(self, input, dL_dy):
-        return dL_dy * (input > 0)
-
+    def forward_and_vjp(self, input):
+        def _vjp(dL_dy):
+            return (dL_dy*(input > 0), torch.Tensor([]))
+        return self.forward(input), _vjp
 
 
 class Sigmoid(Module):
@@ -145,13 +143,13 @@ class Sigmoid(Module):
 
     def forward(self,input):
         return torch.sigmoid(input)
-    
     __call__ = forward
 
-    def backward(self, input, dL_dy):
-        dsigma_dx = torch.sigmoid(input)*(1.-torch.sigmoid(input))
-        return dL_dy*dsigma_dx
-
+    def forward_and_vjp(self, input):
+        def _vjp(dL_dy):
+            dsigma_dx = torch.sigmoid(input)*(1.-torch.sigmoid(input))
+            return (dL_dy*dsigma_dx , torch.Tensor([]))
+        return self.forward(input), _vjp
 
 
 class Conv2d(Module):
@@ -166,20 +164,15 @@ class Conv2d(Module):
 
         self.weight   = torch.Tensor(out_channels, in_channels, kernel_size, kernel_size)
         if initialize: _init_weights(self.weight)
-
-        self.parameters = [self.weight, None]
         
     def forward(self, input):
         return conv2d(input, self.weight, stride=self.stride, padding=self.padding, dilation=self.dilation)
-    
     __call__ = forward
-    
-    def backward(self, input, dL_dy):
-        dL_dx, dL_df = conv_backward(input, dL_dy, self.weight, stride=self.stride, padding=self.padding, dilation=self.dilation)
-        self.parameters[1] = dL_df
-        return dL_dx
-    
-    
+
+    def forward_and_vjp(self, input):
+        _vjp = lambda dL_dy : conv_backward(input, dL_dy, self.weight, stride=self.stride, padding=self.padding, dilation=self.dilation)
+        return self.forward(input), _vjp
+            
     
 class TransposeConv2d(Module):
     def __init__(self, in_channels, out_channels, kernel_size, stride=1, padding=0, dilation=1, initialize=True):
@@ -194,25 +187,24 @@ class TransposeConv2d(Module):
         self.weight   = torch.Tensor(in_channels, out_channels, kernel_size, kernel_size)
         if initialize: _init_weights(self.weight)
 
-        self.parameters = [self.weight, None]
-        
     def forward(self, input):
         return conv_transpose2d(input, self.weight, stride=self.stride, padding=self.padding, dilation=self.dilation)
-    
     __call__ = forward
     
-    def backward(self, input, dL_dy):
+
+    def forward_and_vjp(self, input):
         p = self.kernel_size-1-self.padding
         z = self.stride-1
         
         eff_input  = augment(input, nzeros=z, padding=p)
         eff_weight = self.weight.flip(2,3).transpose(0,1)
-        dL_dx, dL_df = conv_backward(eff_input, dL_dy, eff_weight, stride=1, padding=0, dilation=1)
         
-        dL_df = dL_df.flip(2,3).transpose(0,1)
-        self.parameters[1] = dL_df
-        return dL_dx[:,:,p:-p:z+1, p:-p:z+1]
-
+        def _vjp(dL_dy):
+            dL_dx, dL_df = conv_backward(eff_input, dL_dy, eff_weight, stride=1, padding=0, dilation=1)
+            dL_df = dL_df.flip(2,3).transpose(0,1)
+            dL_dx = dL_dx[:,:,p:-p:z+1, p:-p:z+1]
+            return (dL_dx, dL_df)
+        return self.forward(input), _vjp
 
 
 class MSE(Module):
@@ -221,35 +213,25 @@ class MSE(Module):
         self.input : torch.Tensor
         self.reference : torch.Tensor
     
-    def forward(self,input,reference):
-        self.input     = input
-        self.reference = reference
-        output         = ((input-reference)**2).sum()/input.size().numel()
-        return output.item()
-
+    def forward(self, input, reference):
+        return (((input-reference)**2).sum()/input.size().numel()).item()
     __call__ = forward
 
-    def backward(self):
-        return 2*(self.input - self.reference)/self.input.size().numel()
-
+    def forward_and_vjp(self, reference):
+        dL_dy = lambda input : 2*(input - reference)/input.size().numel()
+        return dL_dy
 
 
 class Sequential():
     def __init__(self, *args, initialize=True):
         self._modules: Dict[str, Optional['Module']] = OrderedDict()
+        self.nb_modules = len(args)
 
         for idx, module in enumerate(args):
             self._add_module(str(idx), module)
 
-        self._nb_modules = len(args)
-        self._inputs = [None]* self._nb_modules
         if initialize: self._initialize()
 
-    def __str__(self):
-        to_print = '\n'
-        for key,val in self._modules.items():
-            to_print += key + '\n'
-        return to_print
 
     def _add_module(self, name, module):
         self._modules[name] = module
@@ -261,25 +243,23 @@ class Sequential():
 
     def parameters(self):
         for module in self._modules.values():
-            yield module.parameters
-    
-    def zero_grad(self):
-        for module in self._modules.values():
-            if module.parameters:
-                module.parameters[1] = 0
+            if len(module.weight):
+                yield [module.weight, module.d_weight]
 
     def forward(self, input):
-        for i, module in enumerate(self._modules.values()):
-            self._inputs[i] = input
+        for module in self._modules.values():
             input = module(input)
         return input
-
     __call__ = forward
 
-    def backward(self,x):
-        for i, module in enumerate(reversed(self._modules.values())):
-            x = module.backward(self._inputs[-(i+1)], x)
-           
+    def forward_and_vjp(self, input, vjp_loss):
+        VJP = [None]*self.nb_modules
+        for i,module in enumerate(self._modules.values()):
+            input, VJP[i] = module.forward_and_vjp(input)
+
+        dL_dy = vjp_loss(input)
+        for i, (module, vjp) in enumerate( zip( reversed(self._modules.values()), reversed(VJP) )  ):
+            dL_dy, module.d_weight = vjp(dL_dy)
 
 
 
@@ -301,22 +281,19 @@ class Model():
 
         self.loss = MSE()
 
-        self.eta         = 0.1
+        self.eta         = 0.5
         self.gamma       = 0.5
         self.params_old  = None
         self.batch_size  = 16
     
-        my_conv1 = Conv2d(in_channels=3, out_channels=self.features, stride=self.stride,  kernel_size=self.kernel_size)
-        my_conv2 = Conv2d(in_channels=self.features, out_channels=self.features, stride=self.stride,  kernel_size=self.kernel_size)
+        conv1   = Conv2d(in_channels=3, out_channels=self.features, stride=self.stride,  kernel_size=self.kernel_size)
+        conv2   = Conv2d(in_channels=self.features, out_channels=self.features, stride=self.stride,  kernel_size=self.kernel_size)
+        tconv1  = TransposeConv2d(in_channels=self.features, out_channels=self.features,  stride=self.stride,  kernel_size=self.kernel_size, padding=0, dilation=1)
+        tconv2  = TransposeConv2d(in_channels=self.features, out_channels=3,  stride=self.stride,  kernel_size=self.kernel_size, padding=0, dilation=1)
+        relu    = ReLU()
+        sigmoid = Sigmoid()
 
-
-        my_tconv1 = TransposeConv2d(in_channels=self.features, out_channels=self.features,  stride=self.stride,  kernel_size=self.kernel_size, padding=0, dilation=1)
-        my_tconv2 = TransposeConv2d(in_channels=self.features, out_channels=3,  stride=self.stride,  kernel_size=self.kernel_size, padding=0, dilation=1)
-
-        my_relu = ReLU()
-        my_sigmoid = Sigmoid()
-
-        self.net = Sequential(my_conv1, my_relu, my_conv2, my_relu, my_tconv1, my_relu, my_tconv2, my_sigmoid, initialize=True)
+        self.net = Sequential(conv1, relu, conv2, relu, tconv1, relu, tconv2, sigmoid, initialize=True)
 
         
     def predict(self,x) -> torch.Tensor:
@@ -326,42 +303,23 @@ class Model():
     def train(self, train_input, train_target, nb_epochs):
         for e in range(nb_epochs):
             for inputs, targets in zip(train_input.split(self.batch_size), train_target.split(self.batch_size)):
-                output = self.net(inputs)
-                self.loss(output, targets)
-
-                self.net.zero_grad()
-                self.net.backward(self.loss.backward())
-                
-                for p in self.net.parameters(): 
-                    if p : p[0] -= self.eta * p[1]
+                dL_dy = self.loss.forward_and_vjp(targets)
+                self.net.forward_and_vjp(inputs, dL_dy)
+                self.SGD()
             print("\rCompleted: %d/%d"%(e+1,nb_epochs), end=' ')
         return 
 
 
-
-
-
-    # def train(self, train_input, train_target, num_epochs):
-    #     for epoch in range(num_epochs):
-    #         print(f'Epoch {epoch}')
-    #         for x, trg in zip(train_input.split(self.batch_size), train_target.split(self.batch_size)):
-    #             out = self.net(x)
-    #             _ = self.loss(out, trg)
-
-    #             self.net.zero_grad()
-    #             self.net.backward(self.loss.backward())
-
-
-    #             self.SGD()    
-
     def SGD(self):
-        for idx, p in enumerate(self.net.parameters()):
-            if p:
-                if self.params_old is not None:
-                    grad = self.gamma * self.params_old[idx][1] + self.eta * p[1] 
-                else:
-                    grad = self.eta * p[1]
-                p[0] = p[0] - grad
-        self.params_old = copy.deepcopy(list(self.net.parameters()))
+        for p in self.net.parameters():
+                        
+            #if self.params_old:
+            grad = self.eta * p[1]
+            #else:
+            #    grad = self.gamma * self.params_old[1] + self.eta * p[1] 
+
+            p[0] -= grad
+
+        #self.params_old = copy.deepcopy(list(self.net.parameters()))
                 
 
