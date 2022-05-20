@@ -295,9 +295,6 @@ class Sequential():
 class Model():
 
     def __init__(self) -> None:
-
-        self.criterion   = MSE()
-        self.optimizer   = None
         self.stride      = 2
         self.kernel_size = 2
         self.features    = 32
@@ -307,10 +304,8 @@ class Model():
         self.eta         = 0.1
         self.gamma       = 0.5
         self.params_old  = None
-        self.batch_size  = 32
-
-        
-
+        self.batch_size  = 16
+    
         my_conv1 = Conv2d(in_channels=3, out_channels=self.features, stride=self.stride,  kernel_size=self.kernel_size)
         my_conv2 = Conv2d(in_channels=self.features, out_channels=self.features, stride=self.stride,  kernel_size=self.kernel_size)
 
@@ -323,27 +318,7 @@ class Model():
 
         self.net = Sequential(my_conv1, my_relu, my_conv2, my_relu, my_tconv1, my_relu, my_tconv2, my_sigmoid, initialize=True)
 
-        conv1 = Conv2d(3,self.features, self.kernel_size, stride=self.stride, padding=0, dilation=1)
-        # conv1.weight=f
-        relu1 = ReLU()
-        conv2 = Conv2d(self.features,self.features,self.kernel_size, stride=self.stride, padding=0, dilation=1)
-        relu2 = ReLU()
-        tconv3 = TransposeConv2d(self.features,self.features, self.kernel_size, stride=self.stride, padding=0, dilation=1)
-        relu3 = ReLU()
-        tconv4 = TransposeConv2d(self.features,3, self.kernel_size, stride=self.stride, padding=0, dilation=1)
-        sig4 = Sigmoid() 
-
-        self.net = Sequential(conv1,  
-                        relu1,  
-                        conv2, 
-                        relu2, 
-                        tconv3,
-                        relu3, 
-                        tconv4,
-                        sig4
-                        )
-        self.net._initialize()
-
+        
     def predict(self,x) -> torch.Tensor:
         return self.net.forward(x)
 
@@ -352,7 +327,7 @@ class Model():
         for e in range(nb_epochs):
             for inputs, targets in zip(train_input.split(self.batch_size), train_target.split(self.batch_size)):
                 output = self.net(inputs)
-                _ = self.loss(output, targets)
+                self.loss(output, targets)
 
                 self.net.zero_grad()
                 self.net.backward(self.loss.backward())
