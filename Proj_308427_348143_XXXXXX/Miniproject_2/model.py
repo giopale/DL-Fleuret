@@ -354,5 +354,13 @@ class Model():
             p[1] -= grad_b
 
         #self.params_old = copy.deepcopy(list(self.net.parameters()))
+
+    def save(self, filename) -> None:
+        torch.save(self.state_dict(), filename)
+
+    def load_pretrained_model(self, filename='Proj_308427_348143_XXXXXX/Miniproject_2/bestmodel.pth') -> None:
+        new_model = torch.load(filename)
+        self=new_model
+
                 
 
