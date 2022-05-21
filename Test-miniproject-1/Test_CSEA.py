@@ -8,7 +8,7 @@ from torch.nn import functional as F
 import time
 import sys
 import platform
-if 'Darwin' in platform.system:
+if 'Darwin' in platform.system():
     sys.path.append('/Users/gpalermo/Github/DL-Fleuret/Proj_308427_348143_XXXXXX')
 else:
     sys.path.append('/home/palermo/DL-Fleuret/Proj_308427_348143_XXXXXX')
