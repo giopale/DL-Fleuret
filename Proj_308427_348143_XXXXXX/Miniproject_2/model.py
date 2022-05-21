@@ -30,42 +30,17 @@ def _calculate_fan_in_and_fan_out(tensor):
 def xavier_normal_(tensor, gain=1.4142135623730951):
     fan_in, fan_out = _calculate_fan_in_and_fan_out(tensor)
     std = gain * math.sqrt(2.0 / (fan_in + fan_out))
-    return tensor.normal_(0, std)
+    tensor.normal_(0, std)
+    return 
 
+def constant_(tensor, val:float):
+    tensor.fill_(val)
+    return 
 
 def _init_weights(model):
     if isinstance(model, Conv2d) or isinstance(model, TransposeConv2d):
         xavier_normal_(model.weight) # model.weight.normal_(0,0.5,generator=torch.manual_seed(0)) #
-        #xavier_normal_(model.bias)
-
-
-# def conv2d(input, weight, stride=1, padding=0, dilation=1):
-#     N, _, h_in, w_in = input.shape
-#     out_channels, in_channels, kernel_size = weight.shape[:-1]
-    
-#     assert input.shape[1] == in_channels
-    
-#     h_out = int((h_in + 2*padding - dilation*(kernel_size-1)-1)/stride+1)
-#     w_out = int((w_in + 2*padding - dilation*(kernel_size-1)-1)/stride+1)
-
-#     x = unfold(input, kernel_size=kernel_size, padding=padding, dilation=dilation, stride=stride)
-#     cΠks, L = x.shape[1], x.shape[2]
-    
-#     x = torch.transpose(x, 1, 2).reshape(-1, cΠks)
-#     weight_flat = weight.reshape(out_channels, cΠks)
-    
-#     x = x @ weight_flat.t()
-#     x = x.reshape(N, L, out_channels).transpose_(1, 2)
-#     x = fold(x, output_size=[h_out, w_out], kernel_size=1, padding=0, dilation=dilation, stride=1)
-#     return x
-
-
-# def conv_transpose2d(input, weight, stride=1, padding=0, dilation=1):
-#     N, _, h_in, w_in = input.shape
-#     in_channels, out_channels, kernel_size = weight.shape[:-1]
-    
-#     eff_input = augment(input, nzeros=stride-1, padding=kernel_size-1-padding)
-#     return  conv2d(eff_input, weight.flip(2,3).transpose(0,1), stride=1, padding=0, dilation=1) 
+        constant_(model.bias, 0.)
 
 
 def conv2d(X, K, stride=1, padding=0, dilation=1, bias=torch.Tensor([])):
@@ -336,7 +311,7 @@ class Model():
 
         self.loss = MSE()
 
-        self.eta         = 0.5
+        self.eta         = 0.75
         self.gamma       = 0.5
         self.params_old  = None
         self.batch_size  = 16
