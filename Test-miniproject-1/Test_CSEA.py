@@ -10,8 +10,11 @@ import sys
 import platform
 if 'Darwin' in platform.system():
     sys.path.append('/Users/gpalermo/Github/DL-Fleuret/Proj_308427_348143_XXXXXX')
+    directory_repo = '/Users/gpalermo/Github/DL-Fleuret/'
 else:
     sys.path.append('/home/palermo/DL-Fleuret/Proj_308427_348143_XXXXXX')
+    directory_repo = '/home/palermo/DL-Fleuret/'
+
 import argparse
 import multiprocessing
 
@@ -106,7 +109,7 @@ with open(filename, 'a') as file:
 
 
 # Load dataset or portion of it
-path_data = '/Users/gpalermo/Github/DL-Fleuret/data'
+path_data = directory_repo + '/data'
 valid_input, valid_target = torch.load(path_data+'/'+'val_data.pkl',map_location=device)#validation set (noise-clean)
 train_input, train_target = torch.load(path_data+'/'+'train_data.pkl',map_location=device) #test set (noise-noise)
 
