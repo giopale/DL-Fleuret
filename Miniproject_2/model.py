@@ -355,7 +355,7 @@ class Model():
         return self.net.forward(x)
 
 
-    def train(self, train_input, train_target, nb_epochs):
+    def train(self, train_input, train_target, nb_epochs=5):
         for e in range(nb_epochs):
             for inputs, targets in zip(train_input.split(self.batch_size), train_target.split(self.batch_size)):
                 dL_dy = self.loss.forward_and_vjp(targets)
