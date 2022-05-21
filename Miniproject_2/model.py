@@ -299,7 +299,7 @@ class Sequential():
     def parameters(self):
         for module in self._modules.values():
             if len(module.weight):
-                yield [module.weight, module.d_weight]
+                yield [module.weight, module.bias, module.d_weight, module.d_bias]
 
     def forward(self, input):
         for module in self._modules.values():
@@ -314,7 +314,7 @@ class Sequential():
 
         dL_dy = vjp_loss(input)
         for i, (module, vjp) in enumerate( zip( reversed(self._modules.values()), reversed(VJP) )  ):
-            dL_dy, module.d_weight = vjp(dL_dy)
+            dL_dy, module.d_weight, module.d_bias = vjp(dL_dy)
 
 
 
@@ -369,11 +369,13 @@ class Model():
         for p in self.net.parameters():
                         
             #if self.params_old:
-            grad = self.eta * p[1]
+            grad_w = self.eta * p[2]
+            grad_b = self.eta * p[3]
             #else:
             #    grad = self.gamma * self.params_old[1] + self.eta * p[1] 
 
-            p[0] -= grad
+            p[0] -= grad_w
+            p[1] -= grad_b
 
         #self.params_old = copy.deepcopy(list(self.net.parameters()))
                 
