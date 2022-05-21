@@ -129,7 +129,7 @@ class Tests(unittest.TestCase):
     def _test_train_model(self, project_number):
         Model = importlib.import_module(f"Miniproject_{project_number}.model").Model
         model = Model()
-        # model.load_pretrained_model()
+        model.load_pretrained_model()
 
         train_path = data_path / "train_data.pkl"
         val_path = data_path / "val_data.pkl"
@@ -141,7 +141,7 @@ class Tests(unittest.TestCase):
         val_input = val_input[:100].float() / 255.0
         val_target = val_target[:100].float() / 255.0
 
-        # output_psnr_before = self.compute_psnr(val_input, val_target)
+        output_psnr_before = self.compute_psnr(val_input, val_target)
 
         model.train(train_input0, train_input1)
 
