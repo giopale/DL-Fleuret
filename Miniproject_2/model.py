@@ -183,7 +183,7 @@ class ReLU(Module):
 
     def forward_and_vjp(self, input):
         def _vjp(dL_dy):
-            return (dL_dy*(input > 0), torch.Tensor([]))
+            return (dL_dy*(input > 0), torch.Tensor([]), torch.Tensor([]))
         return self.forward(input), _vjp
 
 
@@ -199,7 +199,7 @@ class Sigmoid(Module):
     def forward_and_vjp(self, input):
         def _vjp(dL_dy):
             dsigma_dx = torch.sigmoid(input)*(1.-torch.sigmoid(input))
-            return (dL_dy*dsigma_dx , torch.Tensor([]))
+            return (dL_dy*dsigma_dx , torch.Tensor([]), torch.Tensor([]))
         return self.forward(input), _vjp
 
 
@@ -258,7 +258,7 @@ class TransposeConv2d(Module):
             dL_dx, dL_df = conv_backward(eff_input, dL_dy, eff_weight, stride=1, padding=0, dilation=1)
             dL_df = dL_df.flip(2,3).transpose(0,1)
             dL_dx = dL_dx[:,:,p:-p:z+1, p:-p:z+1]
-            return (dL_dx, dL_df, dL_dy.sum((0,2,3)))
+            return dL_dx, dL_df, dL_dy.sum((0,2,3))
         return self.forward(input), _vjp
 
 
