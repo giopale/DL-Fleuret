@@ -1,0 +1,26 @@
+########################################################
+####################### Network test ###################
+########################################################
+
+date & time: 2022/05/21-15:37:16
+running on 8 processors
+
+####################### Configuration ##################
+
+Net parameters:
+-> oute : 64
+-> outd : 128
+-> ChIm : 3
+-> kers : 3
+-> nb_elayers : 4
+Training parameters:
+-> n_train_samples : 1000
+-> batch_size : 32
+-> criterion : MSELoss()
+-> n_epochs : 5
+
+####################### Training #######################
+
+Training on 5 epochs:
+Epoch:	 Tr_Err:	  PSNR[dB]:
+

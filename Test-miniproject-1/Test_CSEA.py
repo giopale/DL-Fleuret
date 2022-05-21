@@ -7,6 +7,7 @@ from torch import nn
 from torch.nn import functional as F
 import time
 import sys
+sys.path.append('/Users/gpalermo/Github/DL-Fleuret/Proj_308427_348143_XXXXXX')
 import argparse
 import multiprocessing
 
@@ -26,10 +27,10 @@ num_proc = multiprocessing.cpu_count()
 
 # Argument parsing
 parser = argparse.ArgumentParser()
-parser.add_argument('--train-samples', dest='train_samples', type=int, help='Number of train samples to use')
-parser.add_argument('--batch-size', dest='batch_size', type=int, help='Batch size to use')
-parser.add_argument('--epochs', dest='epochs', type=int, help='Number of epochs')
-parser.add_argument('--param-file', dest='param_file', type=str, help='Name of the file where parameters are saved')
+parser.add_argument('--train-samples', dest='train_samples', type=int, help='Number of train samples to use',required=False)
+parser.add_argument('--batch-size', dest='batch_size', type=int, help='Batch size to use', required=False)
+parser.add_argument('--epochs', dest='epochs', type=int, help='Number of epochs',required=False)
+parser.add_argument('--save-param', dest='file_param_save', type=str, help='Name of the file where parameters are saved',required=False)
 args = parser.parse_args()
 
 
@@ -75,6 +76,7 @@ config_train={
 }
 net.criterion  = config_train['criterion']
 net.batch_size = config_train['batch_size']
+net.num_epochs = config_train['n_epochs']
 
 with open(filename, 'a') as file:
     file.write(''+'\n')
@@ -91,8 +93,9 @@ with open(filename, 'a') as file:
 
 
 # Load dataset or portion of it
-valid_input, valid_target = torch.load('val_data.pkl',map_location=device)#validation set (noise-clean)
-train_input, train_target = torch.load('train_data.pkl',map_location=device) #test set (noise-noise)
+path_data = '/Users/gpalermo/Github/DL-Fleuret/data'
+valid_input, valid_target = torch.load(path_data+'/'+'val_data.pkl',map_location=device)#validation set (noise-clean)
+train_input, train_target = torch.load(path_data+'/'+'train_data.pkl',map_location=device) #test set (noise-noise)
 
 valid_input  = valid_input.float() / 255.
 valid_target = valid_target.float()/ 255.
@@ -111,10 +114,11 @@ with open(filename, 'a') as file:
     file.write(''+'\n')
 
 t_train=time.time()
-net.train(train_input, train_target, config_train['n_epochs'], valid_input, valid_target, filename)
+net.train(train_input, train_target, val_input=valid_input, \
+            val_target=valid_target, filename=filename)
 t_train=time.time()-t_train
 
-file_params=args.param_file
+file_params=args.file_param_save
 if file_params is not None:
     net.save(file_params)
 
