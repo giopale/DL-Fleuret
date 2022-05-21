@@ -5,7 +5,7 @@ import torch, math
 from collections import OrderedDict
 from typing import Dict, Optional
 from torch.nn.functional import fold, unfold
-import copy
+import pickle, copy
 
 torch.set_grad_enabled(False)
 
@@ -261,7 +261,7 @@ class Sequential():
             self._add_module(str(idx), module)
 
         if initialize: self._initialize()
-
+        self.get_state_dict()
 
     def _add_module(self, name, module):
         self._modules[name] = module
@@ -274,7 +274,7 @@ class Sequential():
     def parameters(self):
         for module in self._modules.values():
             if len(module.weight):
-                yield [module.weight, module.bias, module.d_weight, module.d_bias]
+                yield [module.weight, module.bias, module.d_weight, module.d_bias]    
 
     def forward(self, input):
         for module in self._modules.values():
@@ -291,6 +291,23 @@ class Sequential():
         for i, (module, vjp) in enumerate( zip( reversed(self._modules.values()), reversed(VJP) )  ):
             dL_dy, module.d_weight, module.d_bias = vjp(dL_dy)
 
+
+    def get_state_dict(self):
+        self.state_dict : Dict[str, torch.Tensor] = OrderedDict()
+        for key, module in self._modules.items():
+            if len(module.weight):
+                self.state_dict[key+'.weights'] = module.weight
+                self.state_dict[key+'.bias'] = module.bias
+            
+        return 
+
+    def load_state_dict(self, state_dict):
+        for key, module in self._modules.items():
+            if len(module.weight):
+                module.weight.data = state_dict[key+'.weights']
+                module.bias.data   = state_dict[key+'.bias']
+        self.get_state_dict()
+        return 
 
 
 
@@ -356,11 +373,14 @@ class Model():
         #self.params_old = copy.deepcopy(list(self.net.parameters()))
 
     def save(self, filename) -> None:
-        torch.save(self.state_dict(), filename)
+        with open(filename, "wb") as fp:
+            pickle.dump(self.net.state_dict, fp)
+
 
     def load_pretrained_model(self, filename='Proj_308427_348143_XXXXXX/Miniproject_2/bestmodel.pth') -> None:
-        new_model = torch.load(filename)
-        self=new_model
+        with open(filename, "rb") as fp:
+            state_dict = pickle.load(fp)
+        self.net.load_state_dict(state_dict)
 
                 
 
