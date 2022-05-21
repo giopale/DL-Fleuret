@@ -102,8 +102,8 @@ class Tests(unittest.TestCase):
         val_path = data_path / "val_data.pkl"
         val_input, val_target = torch.load(val_path)
 
-        val_input =  val_input.float() / 255.0
-        val_target = val_target.float() / 255.0
+        val_input  = val_input[:100].float() / 255.0
+        val_target = val_target[:100].float() / 255.0
 
         mini_batch_size = 100
         model_outputs = []
@@ -132,10 +132,10 @@ class Tests(unittest.TestCase):
         train_input0, train_input1 = torch.load(train_path)
         val_input, val_target = torch.load(val_path)
 
-        train_input0 = (train_input0.float() / 255.0).requires_grad_()
-        train_input1 = (train_input1.float() / 255.0).requires_grad_()
-        val_input = val_input.float() / 255.0
-        val_target = val_target.float() / 255.0
+        train_input0 = (train_input0[:100].float() / 255.0).requires_grad_()
+        train_input1 = (train_input1[:100].float() / 255.0).requires_grad_()
+        val_input = val_input[:100].float() / 255.0
+        val_target = val_target[:100].float() / 255.0
 
         # output_psnr_before = self.compute_psnr(val_input, val_target)
 
