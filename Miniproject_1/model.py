@@ -107,7 +107,6 @@ class Model(nn.Module):
         #ENCODER
         pout = [x]
         y = self.relu(self.conv0(x))
-
         for l in self.eblocks[:-1]:
             y = l(y)
             pout.append(y)
@@ -148,14 +147,15 @@ class Model(nn.Module):
         for epoch in range(num_epochs):
             for inputs, targets in zip(train_input.split(self.batch_size), train_target.split(self.batch_size)):
                 output = self.predict(inputs)
+                print(output.requires_grad)
                 loss   = self.criterion(output, targets)
 
                 self.optimizer.zero_grad()
                 loss.backward()
                 self.optimizer.step()
 
-            mse, psnr = self.validate(val_input, val_target)
-            self.scheduler.step(mse)
+            #mse, psnr = self.validate(val_input, val_target)
+            #self.scheduler.step(mse)
 
             if filename is not None:
                 with open(filename, 'a') as file:
