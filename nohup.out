@@ -1,0 +1,313 @@
+[W 2022-05-21 10:24:08.669 LabApp] 'port' has moved from NotebookApp to ServerApp. This config will be passed to ServerApp. Be sure to update your config before our next release.
+[W 2022-05-21 10:24:08.669 LabApp] 'port' has moved from NotebookApp to ServerApp. This config will be passed to ServerApp. Be sure to update your config before our next release.
+[W 2022-05-21 10:24:08.669 LabApp] 'port' has moved from NotebookApp to ServerApp. This config will be passed to ServerApp. Be sure to update your config before our next release.
+[I 2022-05-21 10:24:08.674 LabApp] JupyterLab extension loaded from /home/luca_ltpn/anaconda3/lib/python3.9/site-packages/jupyterlab
+[I 2022-05-21 10:24:08.674 LabApp] JupyterLab application directory is /home/luca_ltpn/anaconda3/share/jupyter/lab
+[I 10:24:08.680 NotebookApp] Serving notebooks from local directory: /home/luca_ltpn/DL-Fleuret
+[I 10:24:08.680 NotebookApp] Jupyter Notebook 6.4.8 is running at:
+[I 10:24:08.680 NotebookApp] http://localhost:8888/?token=f14bb7bcd6b6c16b12224c210e2606054a36478fcf98ea39
+[I 10:24:08.680 NotebookApp]  or http://127.0.0.1:8888/?token=f14bb7bcd6b6c16b12224c210e2606054a36478fcf98ea39
+[I 10:24:08.680 NotebookApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
+[C 10:24:08.682 NotebookApp] 
+    
+    To access the notebook, open this file in a browser:
+        file:///home/luca_ltpn/.local/share/jupyter/runtime/nbserver-667311-open.html
+    Or copy and paste one of these URLs:
+        http://localhost:8888/?token=f14bb7bcd6b6c16b12224c210e2606054a36478fcf98ea39
+     or http://127.0.0.1:8888/?token=f14bb7bcd6b6c16b12224c210e2606054a36478fcf98ea39
+[I 10:24:27.573 NotebookApp] 302 GET / (127.0.0.1) 0.870000ms
+[W 10:24:28.050 NotebookApp] 404 GET /apple-touch-icon-precomposed.png (127.0.0.1) 11.320000ms referer=None
+[W 10:24:28.064 NotebookApp] 404 GET /apple-touch-icon.png (127.0.0.1) 1.600000ms referer=None
+[W 10:24:39.285 NotebookApp] Notebook Test-miniproject-2/Module tests.ipynb is not trusted
+[I 10:24:45.684 NotebookApp] Kernel started: 511fc418-a0bb-4686-8499-eec45dcd14b9, name: python3
+[I 10:24:49.923 NotebookApp] Starting buffering for 511fc418-a0bb-4686-8499-eec45dcd14b9:f393810d62294627b6991838fcfafe04
+[I 10:24:52.036 NotebookApp] Kernel shutdown: 511fc418-a0bb-4686-8499-eec45dcd14b9
+[I 10:24:56.144 NotebookApp] Copying Test-miniproject-2/Module tests.ipynb to /Test-miniproject-2
+[W 10:24:56.156 NotebookApp] Notebook Test-miniproject-2/Module tests.ipynb is not trusted
+[W 10:24:56.165 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[W 10:24:58.074 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 10:25:05.793 NotebookApp] Kernel started: 8cba0a80-8d2a-465e-b25a-202f841f0ee3, name: python3
+[I 10:25:46.373 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 10:25:46.375 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 10:25:54.153 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 10:25:54.154 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 10:27:11.021 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 10:27:11.023 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 10:27:29.343 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 10:27:29.344 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 10:27:34.049 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 10:27:34.050 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 10:28:04.384 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 10:28:04.385 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 10:28:28.741 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 10:28:28.743 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 10:28:38.359 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 10:28:38.361 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 10:28:49.674 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 10:28:49.675 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 10:28:53.822 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 10:28:53.823 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 10:28:57.859 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 10:28:57.860 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 10:29:35.355 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 10:29:35.356 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 10:30:01.445 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 10:30:01.447 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 10:30:05.128 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 10:30:05.129 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 10:30:16.809 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 10:30:16.810 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 10:30:37.454 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 10:30:37.456 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 10:30:41.768 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 10:30:41.770 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 10:31:05.834 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 10:31:05.835 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 10:31:06.566 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 10:31:06.567 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 10:31:18.696 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 10:31:18.697 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 10:31:28.255 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 10:31:28.257 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 10:31:33.228 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 10:31:33.229 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 10:32:22.769 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 10:32:22.771 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 10:32:39.475 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 10:32:39.476 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 10:32:48.870 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 10:32:48.871 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 10:33:05.919 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 10:33:05.920 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 10:33:09.497 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 10:33:09.498 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 10:33:18.790 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 10:33:18.791 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 10:33:28.863 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 10:33:28.864 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 10:34:17.939 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 10:34:17.941 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 10:34:23.067 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 10:34:23.069 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 10:35:02.283 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 10:35:02.285 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 10:35:55.112 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 10:35:55.113 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 10:36:09.473 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 10:36:09.474 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 10:36:14.321 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 10:36:14.322 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 10:36:42.995 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 10:36:42.996 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 10:36:54.284 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 10:36:54.286 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 10:36:56.376 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 10:36:56.378 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 10:37:05.843 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 10:37:05.844 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 10:37:06.019 NotebookApp] Starting buffering for 8cba0a80-8d2a-465e-b25a-202f841f0ee3:66b6ee80989943b0914e73acfdb03423
+[I 10:37:06.232 NotebookApp] Kernel restarted: 8cba0a80-8d2a-465e-b25a-202f841f0ee3
+[I 10:37:06.269 NotebookApp] Restoring connection for 8cba0a80-8d2a-465e-b25a-202f841f0ee3:66b6ee80989943b0914e73acfdb03423
+[I 10:37:06.630 NotebookApp] Replaying 3 buffered messages
+[I 10:38:30.192 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 10:38:30.194 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 10:39:05.990 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 10:39:05.992 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 10:41:05.996 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 10:41:05.997 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 10:41:38.624 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 10:41:38.626 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 10:42:04.332 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 10:42:04.333 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 10:42:12.616 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 10:42:12.617 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 10:42:17.161 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 10:42:17.162 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 10:42:27.904 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 10:42:27.906 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 10:42:48.813 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 10:42:48.815 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 10:43:15.957 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 10:43:15.958 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 10:43:33.147 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 10:43:33.148 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 10:43:54.583 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 10:43:54.585 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 10:44:29.794 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 10:44:29.795 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 10:44:38.646 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 10:44:38.648 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 10:44:59.754 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 10:44:59.755 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 10:47:06.387 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 10:47:06.389 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 10:47:11.646 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 10:47:11.648 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 10:49:00.764 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 10:49:00.766 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 10:49:06.366 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 10:49:06.367 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 10:51:06.401 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 10:51:06.403 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 10:51:46.653 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 10:51:46.655 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 10:52:38.158 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 10:52:38.160 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 10:54:50.687 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 10:54:50.689 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 10:55:06.363 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 10:55:06.365 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 10:57:06.950 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 10:57:06.951 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 10:59:06.971 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 10:59:06.973 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 11:01:06.969 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 11:01:06.971 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 11:03:06.975 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 11:03:06.977 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 11:05:06.984 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 11:05:06.986 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 11:05:39.857 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 11:05:39.858 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 11:05:57.179 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 11:05:57.181 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 11:09:12.389 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 11:09:12.391 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 11:09:52.262 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 11:09:52.264 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 11:09:53.583 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 11:09:53.585 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 11:09:58.511 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 11:09:58.513 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 11:11:12.384 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 11:11:12.386 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 11:12:45.870 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 11:12:45.872 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 11:13:00.699 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 11:13:00.701 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 11:15:12.482 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 11:15:12.484 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 11:15:24.122 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 11:15:24.124 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 11:15:50.884 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 11:15:50.886 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 11:16:46.355 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 11:16:46.357 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 11:17:12.501 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 11:17:12.502 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 11:19:12.859 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 11:19:12.861 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 11:20:37.758 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 11:20:37.760 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 11:21:12.818 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 11:21:12.820 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 11:21:55.732 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 11:21:55.734 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 11:23:07.052 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 11:23:07.054 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 11:24:41.124 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 11:24:41.126 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 11:25:13.073 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 11:25:13.075 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 11:27:12.949 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 11:27:12.951 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 11:31:12.960 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 11:31:12.962 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 11:37:39.175 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 11:37:39.177 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 11:39:39.185 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 11:39:39.187 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 11:41:39.285 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 11:41:39.287 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 11:43:39.285 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 11:43:39.287 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 11:45:04.468 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 11:45:04.471 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 11:48:32.255 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 11:48:32.257 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 11:49:37.327 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 11:49:37.329 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 11:51:14.513 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 11:51:14.515 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 11:51:39.269 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 11:51:39.271 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 11:51:58.017 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 11:51:58.019 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 11:52:00.504 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 11:52:00.506 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 11:52:34.914 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 11:52:34.916 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 11:52:45.281 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 11:52:45.283 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 11:52:57.615 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 11:52:57.617 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 11:53:19.438 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 11:53:19.440 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 11:53:46.530 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 11:53:46.532 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 11:54:55.271 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 11:54:55.272 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 11:55:37.986 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 11:55:37.988 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 11:56:48.624 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 11:56:48.626 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 11:57:04.309 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 11:57:04.311 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 11:57:39.271 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 11:57:39.273 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 11:57:44.493 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 11:57:44.495 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 11:57:55.379 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 11:57:55.381 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 11:59:12.458 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 11:59:12.460 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 11:59:40.070 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 11:59:40.072 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 11:59:56.178 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 11:59:56.181 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 12:01:40.400 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 12:01:40.402 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 12:03:18.373 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 12:03:18.375 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 12:03:40.469 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 12:03:40.471 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 12:04:10.188 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 12:04:10.190 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 12:04:15.481 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 12:04:15.482 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 12:04:22.903 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 12:04:22.905 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 12:04:24.851 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 12:04:24.853 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 12:04:27.990 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 12:04:27.992 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 12:05:03.878 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 12:05:03.880 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 12:05:40.382 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 12:05:40.385 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 12:06:54.484 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 12:06:54.486 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 12:06:58.059 NotebookApp] Starting buffering for 8cba0a80-8d2a-465e-b25a-202f841f0ee3:66b6ee80989943b0914e73acfdb03423
+[I 12:06:58.574 NotebookApp] Kernel restarted: 8cba0a80-8d2a-465e-b25a-202f841f0ee3
+[I 12:06:58.608 NotebookApp] Restoring connection for 8cba0a80-8d2a-465e-b25a-202f841f0ee3:66b6ee80989943b0914e73acfdb03423
+[I 12:06:58.956 NotebookApp] Replaying 3 buffered messages
+[I 12:07:27.809 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 12:07:27.811 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 12:07:30.985 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 12:07:30.987 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 12:07:40.535 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 12:07:40.537 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 12:08:49.281 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 12:08:49.283 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 12:08:52.665 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 12:08:52.667 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 12:09:40.452 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 12:09:40.455 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 12:09:42.077 NotebookApp] Starting buffering for 8cba0a80-8d2a-465e-b25a-202f841f0ee3:66b6ee80989943b0914e73acfdb03423
+[I 12:09:42.390 NotebookApp] Kernel restarted: 8cba0a80-8d2a-465e-b25a-202f841f0ee3
+[I 12:09:42.484 NotebookApp] Restoring connection for 8cba0a80-8d2a-465e-b25a-202f841f0ee3:66b6ee80989943b0914e73acfdb03423
+[I 12:09:42.834 NotebookApp] Replaying 3 buffered messages
+[I 12:10:26.589 NotebookApp] Saving file at /Test-miniproject-2/Module tests-Copy1.ipynb
+[W 12:10:26.591 NotebookApp] Notebook Test-miniproject-2/Module tests-Copy1.ipynb is not trusted
+[I 12:10:29.093 NotebookApp] Starting buffering for 8cba0a80-8d2a-465e-b25a-202f841f0ee3:66b6ee80989943b0914e73acfdb03423
+[I 12:10:35.089 NotebookApp] Kernel shutdown: 8cba0a80-8d2a-465e-b25a-202f841f0ee3

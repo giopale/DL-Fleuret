@@ -117,7 +117,7 @@ class Model(nn.Module):
     def predict(self, x):
         #ENCODER
         pout = [x]
-        y = torch.relu(self.conv0(x))
+        y = self.relu(self.conv0(x))
         for l in self.eblocks[:-1]:
             y = l(y)
             pout.append(y)
@@ -165,6 +165,7 @@ class Model(nn.Module):
             acc_loss = 0
             for inputs, targets in zip(train_input.split(self.batch_size), train_target.split(self.batch_size)):
                 output = self.predict(inputs)
+                print(output.requires_grad)
                 loss   = self.criterion(output, targets)
                 acc_loss += loss.item()
 
