@@ -36,7 +36,7 @@ def xavier_normal_(tensor, gain=1.4142135623730951):
 def _init_weights(model):
     if isinstance(model, Conv2d) or isinstance(model, TransposeConv2d):
         xavier_normal_(model.weight) # model.weight.normal_(0,0.5,generator=torch.manual_seed(0)) #
-        xavier_normal_(model.bias)
+        #xavier_normal_(model.bias)
 
 
 # def conv2d(input, weight, stride=1, padding=0, dilation=1):
