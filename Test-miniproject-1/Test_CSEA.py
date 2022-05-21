@@ -74,12 +74,18 @@ config_train={
     'batch_size': 32 if args.batch_size is None else args.batch_size,
     'criterion' : nn.MSELoss(),
     'n_epochs'  : 5 if args.epochs is None else args.epochs,
+    'eta'       : 0.1,
+    'momentum'  : 0.9,
+    'weight_decay': 0.0005,
     # optimizer -> set from model.py
     # scheduler -> set form model.py
 }
-net.criterion  = config_train['criterion']
-net.batch_size = config_train['batch_size']
-net.num_epochs = config_train['n_epochs']
+net.criterion    = config_train['criterion']
+net.batch_size   = config_train['batch_size']
+net.num_epochs   = config_train['n_epochs']
+net.eta          = config_train['eta']
+net.momentum     = config_train['momentum']
+net.weight_decay = config_train['weight_decay']
 
 with open(filename, 'a') as file:
     file.write(''+'\n')
