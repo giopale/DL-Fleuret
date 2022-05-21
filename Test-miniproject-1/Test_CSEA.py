@@ -31,8 +31,11 @@ parser.add_argument('--train-samples', dest='train_samples', type=int, help='Num
 parser.add_argument('--batch-size', dest='batch_size', type=int, help='Batch size to use', required=False)
 parser.add_argument('--epochs', dest='epochs', type=int, help='Number of epochs',required=False)
 parser.add_argument('--save-param', dest='file_param_save', type=str, help='Name of the file where parameters are saved',required=False)
+parser.add_argument('--subdir', dest='subdirectory', type=str, help='Folder into which results are printed',required=False)
 args = parser.parse_args()
 
+if args.subdirectory is not None:
+    filename = args.subdirectory + '/' + filename
 
 
 
