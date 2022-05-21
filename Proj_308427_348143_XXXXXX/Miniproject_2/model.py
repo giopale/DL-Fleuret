@@ -4,7 +4,7 @@ from email import generator
 import torch, math
 from collections import OrderedDict
 from typing import Dict, Optional
-from torch.nn.functional import fold, unfold
+from torch.nn.functional import fold, unfold, pad
 import pickle, copy
 
 torch.set_grad_enabled(False)
@@ -92,8 +92,6 @@ def conv_transpose2d(Y, K, stride=1, padding=0, dilation=1, bias=torch.Tensor([]
     return X
 
 
-
-
 def augment(input, nzeros, padding=0):
     shape = input.shape
     nold  = shape[-1]
@@ -102,32 +100,25 @@ def augment(input, nzeros, padding=0):
     new = torch.zeros(*shape[:2], nnew, nnew)
     new[:,:,::(nzeros+1),::(nzeros+1)] = input
                 
-    if padding: new = unfold(new,1, padding=padding).reshape(*new.shape[:2],*[new.shape[-1]+2*padding]*2)
+    if padding: 
+        new = pad(new, (padding, padding, padding, padding))
+        #new = unfold(new,1, padding=padding).reshape(*new.shape[:2],*[new.shape[-1]+2*padding]*2)
     return new
 
 
 def conv_backward(input, dL_dy, weight, stride=1, padding=0, dilation=1):
-    out_channels, in_channels, kernel_size = weight.shape[:-1]
     dL_dx = conv_transpose2d(dL_dy, weight, stride=stride, padding=padding, dilation=dilation)
-
+    
     ignored = int(input.shape[-1]-dL_dx.shape[-1])
     if ignored:
-        dL_dx = unfold(dL_dx, 1, padding=ignored).reshape(*dL_dx.shape[:2],*[dL_dx.shape[-1]+2*ignored]*2)
-        dL_dx = dL_dx[:,:,ignored:, ignored:]
+        dL_dx = pad(dL_dx, (0,ignored,0,ignored))
+        #dL_dx = unfold(dL_dx, 1, padding=ignored).reshape(*dL_dx.shape[:2],*[dL_dx.shape[-1]+2*ignored]*2)
+        #dL_dx = dL_dx[:,:,ignored:, ignored:]
 
-
-    dL_df = torch.zeros_like(weight.transpose(0,1))
-    dL_dy_aug = augment(dL_dy, nzeros=stride-1, padding=0)
-
-    x = input if not ignored else input[:,:,:-ignored, :-ignored]
-    for mu in range(x.shape[0]):
-        for alpha in range(in_channels):
-            dLdy = dL_dy_aug[mu].view(1, out_channels,*dL_dy_aug.shape[2:]).transpose(0,1)
-            xx   = x[mu,alpha].view(1,1,*x.shape[2:])
-            dL_df[alpha] += conv2d(xx, dLdy)[0]
-
-    dL_df.transpose_(0,1)
-    return (dL_dx, dL_df)
+    xt = input.transpose(0,1) if not ignored else input[:,:,:-ignored, :-ignored].transpose(0,1)
+    dL_dy_aug = augment(dL_dy, nzeros=stride-1, padding=0).transpose(0,1)
+    dL_df = conv2d(xt, dL_dy_aug).transpose(0,1)
+    return dL_dx, dL_df
 
 
 
@@ -141,7 +132,7 @@ class Module(object):
         pass
     def forward (self) :
         raise NotImplementedError
-    def backward (self, input):
+    def forward_and_vjp (self, input):
         raise NotImplementedError
     def param (self) :
         return self.parameters
