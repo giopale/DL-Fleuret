@@ -104,7 +104,13 @@ class Model(nn.Module):
 
         self.criterion  = nn.MSELoss()
         self.batch_size = 32
-        self.optimizer  = torch.optim.SGD(self.parameters(), lr=0.1, momentum=0.9, weight_decay=0.0005)
+
+        self.eta        = 0.1
+        self.momentum   = 0.9
+        self.weight_decay = 0.005
+        self.optimizer  = torch.optim.SGD(self.parameters(), lr=self.eta, \
+            momentum=self.momentum, weight_decay=self.weight_decay)
+            
         self.scheduler  = torch.optim.lr_scheduler.ReduceLROnPlateau(self.optimizer, 'min')
         self.do_print   = True
 
