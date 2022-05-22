@@ -148,11 +148,11 @@ class Model(nn.Module):
             if filename is not None:
                 with open(filename, 'a') as file:
                     file.write('Training on {0} epochs:'.format(self.num_epochs)+'\n')
-                    file.write("Epoch:\t Tr_Err:\t PSNR train [dB]\t Val_Err:\t PSNR val [dB]:"+'\n\n')
+                    file.write("Epoch:\t Tr_Err:\t Val_Err:\t PSNR val [dB]:"+'\n\n')
 
         # #pre-process
-        standardize_dataset(train_input , method='per_image')
-        standardize_dataset(train_target, method='per_image')
+        # standardize_dataset(train_input , method='per_image')
+        # standardize_dataset(train_target, method='per_image')
 
         #train
         for epoch in range(self.num_epochs):
@@ -165,14 +165,18 @@ class Model(nn.Module):
                 self.optimizer.zero_grad()
                 loss.backward()
                 self.optimizer.step()
+            
+            acc_loss_per_sample = acc_loss/train_input.shape[0]
 
             if val_input is not None and val_target is not None:
                 mse, psnr = self.validate(val_input, val_target)
                 # self.scheduler.step(mse)
+                mse_per_sample = mse/val_input.shape[0]
+            
 
                 if filename is not None:
                     with open(filename, 'a') as file:
-                        file.write("%d\t %.3f\t %.3f\t %.3f"%(epoch, acc_loss, mse, psnr)+'\n')
+                        file.write("%d\t %.3f\t %.3f\t %.3f"%(epoch, acc_loss_per_sample, mse_per_sample, psnr)+'\n')
 
     #============================
     #           VALIDATE                                            
