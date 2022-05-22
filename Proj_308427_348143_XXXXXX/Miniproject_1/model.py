@@ -152,7 +152,7 @@ class Model(nn.Module):
             if filename is not None:
                 with open(filename, 'a') as file:
                     file.write('Training on {0} epochs:'.format(self.num_epochs)+'\n')
-                    file.write("Epoch:\t Tr_Err:\t  PSNR[dB]:"+'\n\n')
+                    file.write("Epoch:\t Tr_Err:\t PSNR train [dB]\t Val_Err:\t PSNR val [dB]:"+'\n\n')
 
         # #pre-process
         standardize_dataset(train_input , method='per_image')
@@ -164,19 +164,21 @@ class Model(nn.Module):
             for inputs, targets in zip(train_input.split(self.batch_size), train_target.split(self.batch_size)):
                 output = self.predict(inputs)
                 loss   = self.criterion(output, targets)
-                acc_loss += loss.item()
+                acc_loss += loss
+                psnr_train = (-10 * torch.log10(acc_loss + 10**-8)).item()
+
 
                 self.optimizer.zero_grad()
                 loss.backward()
                 self.optimizer.step()
 
             if val_input is not None and val_target is not None:
-                mse, psnr = self.validate(val_input, val_target)
-                #self.scheduler.step(mse)
+                mse, psnr_val = self.validate(val_input, val_target)
+                # self.scheduler.step(mse)
 
                 if filename is not None:
                     with open(filename, 'a') as file:
-                        file.write("%d\t %.3f\t  %.3f"%(epoch, acc_loss, psnr)+'\n')
+                        file.write("%d\t %.3f\t %.3f\t %.3f\t %.3f"%(epoch, acc_loss, psnr_train, mse, psnr_val)+'\n')
 
     #============================
     #           VALIDATE                                            
