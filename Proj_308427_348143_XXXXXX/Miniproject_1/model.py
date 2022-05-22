@@ -165,7 +165,6 @@ class Model(nn.Module):
             acc_loss = 0
             for inputs, targets in zip(train_input.split(self.batch_size), train_target.split(self.batch_size)):
                 output = self.predict(inputs)
-                print(output.requires_grad)
                 loss   = self.criterion(output, targets)
                 acc_loss += loss.item()
 
