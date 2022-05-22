@@ -166,7 +166,7 @@ class Model(nn.Module):
             for inputs, targets in zip(train_input.split(self.batch_size), train_target.split(self.batch_size)):
                 output = self.predict(inputs)
                 loss   = self.criterion(output, targets)
-                acc_loss += loss.item()
+                acc_loss += loss
                 psnr_train = (-10 * torch.log10(acc_loss + 10**-8)).item()
 
 
