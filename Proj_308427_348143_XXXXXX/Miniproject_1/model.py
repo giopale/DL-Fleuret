@@ -4,7 +4,6 @@ from torch import nn
 from torch.nn import functional as F
 
     
-    
 def standardize_dataset(dataset, method='per_image'):
     if dataset.dtype!=torch.float: dataset=dataset.float()
     if method=='per_image':
@@ -16,6 +15,7 @@ def standardize_dataset(dataset, method='per_image'):
         std = dataset.std(0)
         dataset.data.sub_(mu).div_(std)
     return 
+
 
 def _init_weights(model):
     if isinstance(model,nn.Conv2d):
@@ -54,7 +54,6 @@ class _Decoder_Block(nn.Module):
 
 
 
-class Model(nn.Module):
 
 #==================================================================================================================#
 #==================================================================================================================#
@@ -62,6 +61,7 @@ class Model(nn.Module):
 #==================================================================================================================#
 #==================================================================================================================#
 
+class Model(nn.Module):
 
     def __init__(self):
         super().__init__()
@@ -144,10 +144,6 @@ class Model(nn.Module):
     #============================
 
     def train(self, train_input, train_target, filename=None,  val_input=None, val_target=None,) -> None:
-        #fix missing gradients
-        for item in [train_input, train_target]:
-            if not item.requires_grad: item.requires_grad_(True)
-
         if self.do_print: 
             if filename is not None:
                 with open(filename, 'a') as file:
@@ -165,20 +161,18 @@ class Model(nn.Module):
                 output = self.predict(inputs)
                 loss   = self.criterion(output, targets)
                 acc_loss += loss
-                psnr_train = (-10 * torch.log10(acc_loss + 10**-8)).item()
-
 
                 self.optimizer.zero_grad()
                 loss.backward()
                 self.optimizer.step()
 
             if val_input is not None and val_target is not None:
-                mse, psnr_val = self.validate(val_input, val_target)
+                mse, psnr = self.validate(val_input, val_target)
                 # self.scheduler.step(mse)
 
                 if filename is not None:
                     with open(filename, 'a') as file:
-                        file.write("%d\t %.3f\t %.3f\t %.3f\t %.3f"%(epoch, acc_loss, psnr_train, mse, psnr_val)+'\n')
+                        file.write("%d\t %.3f\t %.3f\t %.3f\t %.3f"%(epoch, acc_loss, mse, psnr)+'\n')
 
     #============================
     #           VALIDATE                                            
