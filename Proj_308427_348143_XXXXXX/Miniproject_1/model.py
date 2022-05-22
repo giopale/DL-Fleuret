@@ -172,7 +172,7 @@ class Model(nn.Module):
 
                 if filename is not None:
                     with open(filename, 'a') as file:
-                        file.write("%d\t %.3f\t %.3f\t %.3f\t %.3f"%(epoch, acc_loss, mse, psnr)+'\n')
+                        file.write("%d\t %.3f\t %.3f\t %.3f"%(epoch, acc_loss, mse, psnr)+'\n')
 
     #============================
     #           VALIDATE                                            
