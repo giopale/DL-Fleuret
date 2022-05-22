@@ -158,7 +158,7 @@ class ReLU(Module):
         return 
 
     def forward(self, input):
-        return torch.relu(input)
+        return torch.relu(input)#torch.threshold(input,0,0)
     __call__ = forward
 
     def forward_and_vjp(self, input):
@@ -258,7 +258,7 @@ class Sequential():
             self._add_module(str(idx), module)
 
         if initialize: self._initialize()
-        self.get_state_dict()
+        self.set_state_dict()
 
     def _add_module(self, name, module):
         self._modules[name] = module
@@ -269,9 +269,9 @@ class Sequential():
         return 
 
     def parameters(self):
-        for module in self._modules.values():
+        for i, module in enumerate(self._modules.values()):
             if len(module.weight):
-                yield [module.weight, module.bias, module.d_weight, module.d_bias]    
+                yield i, [module.weight, module.bias, module.d_weight, module.d_bias]
 
     def forward(self, input):
         for module in self._modules.values():
@@ -289,21 +289,17 @@ class Sequential():
             dL_dy, module.d_weight, module.d_bias = vjp(dL_dy)
 
 
-    def get_state_dict(self):
+    def set_state_dict(self):
         self.state_dict : Dict[str, torch.Tensor] = OrderedDict()
-        for key, module in self._modules.items():
-            if len(module.weight):
-                self.state_dict[key+'.weights'] = module.weight
-                self.state_dict[key+'.bias'] = module.bias
-            
+        for i, p in self.parameters():
+            self.state_dict[str(i)+'.weights'] = p[0]
+            self.state_dict[str(i)+'.bias'] = p[1]
         return 
 
     def load_state_dict(self, state_dict):
-        for key, module in self._modules.items():
-            if len(module.weight):
-                module.weight.data = state_dict[key+'.weights']
-                module.bias.data   = state_dict[key+'.bias']
-        self.get_state_dict()
+        for i, p in self.parameters():
+            p[0].data = state_dict[str(i)+'.weights']
+            p[1].data = state_dict[str(i)+'.bias']
         return 
 
 
@@ -356,7 +352,7 @@ class Model():
 
 
     def SGD(self):
-        for p in self.net.parameters():
+        for _, p in self.net.parameters():
                         
             #if self.params_old:
             grad_w = self.eta * p[2]
@@ -372,7 +368,6 @@ class Model():
     def save(self, filename) -> None:
         with open(filename, "wb") as fp:
             pickle.dump(self.net.state_dict, fp)
-
 
     def load_pretrained_model(self, filename='Proj_308427_348143_XXXXXX/Miniproject_2/bestmodel.pth') -> None:
         with open(filename, "rb") as fp:
