@@ -1,55 +1,0 @@
-########################################################
-####################### Network test ###################
-########################################################
-
-date & time: 2022/05/22-18:01:09
-running on 8 processors
-
-####################### Configuration ##################
-
-Net parameters:
--> features : 64
--> kernel_size : 3
-Training parameters:
--> n_train_samples : 10
--> batch_size : 32
--> n_epochs : 5
--> eta : 0.1
--> gamma : 0.9
-
-####################### Training #######################
-
-Completed: 1/30
-Completed: 2/30
-Completed: 3/30
-Completed: 4/30
-Completed: 5/30
-Completed: 6/30
-Completed: 7/30
-Completed: 8/30
-Completed: 9/30
-Completed: 10/30
-Completed: 11/30
-Completed: 12/30
-Completed: 13/30
-Completed: 14/30
-Completed: 15/30
-Completed: 16/30
-Completed: 17/30
-Completed: 18/30
-Completed: 19/30
-Completed: 20/30
-Completed: 21/30
-Completed: 22/30
-Completed: 23/30
-Completed: 24/30
-Completed: 25/30
-Completed: 26/30
-Completed: 27/30
-Completed: 28/30
-Completed: 29/30
-Completed: 30/30
-
-Time:
--> elapsed:	1.0 s
--> per epoch:	0.2 s

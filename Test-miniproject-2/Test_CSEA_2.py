@@ -75,8 +75,8 @@ config_train={
     'n_train_samples': args.train_samples ,
     'batch_size': 32 if args.batch_size is None else args.batch_size,
     'n_epochs'  : 5 if args.epochs is None else args.epochs,
-    'eta'       : 0.1,
-    'gamma'     : 0.9,
+    'eta'       : 0.75,
+    'gamma'     : 0.,
 }
 net.batch_size   = config_train['batch_size']
 net.num_epochs   = config_train['n_epochs']
