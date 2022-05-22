@@ -317,12 +317,13 @@ class Model():
     def __init__(self) -> None:
         self.stride      = 2
         self.kernel_size = 2
-        self.features    = 32
+        self.features    = 64
+        self.nb_epochs   = 30
 
         self.loss = MSE()
 
         self.eta         = 0.75
-        self.gamma       = 0.5
+        self.gamma       = 0.
         self.params_old  = None
         self.batch_size  = 16
     
@@ -340,14 +341,14 @@ class Model():
         return self.net.forward(x)
 
 
-    def train(self, train_input, train_target, nb_epochs=5):
-        for e in range(nb_epochs):
+    def train(self, train_input, train_target):
+        for e in range(self.nb_epochs):
             for inputs, targets in zip(train_input.split(self.batch_size), train_target.split(self.batch_size)):
 
                 dL_dy = self.loss.forward_and_vjp(targets)
                 self.net.forward_and_vjp(inputs, dL_dy)
                 self.SGD()
-            print("\rCompleted: %d/%d"%(e+1,nb_epochs), end=' ')
+            print("\rCompleted: %d/%d"%(e+1,self.nb_epochs), end=' ')
         return 
 
 
