@@ -38,7 +38,7 @@ Note to students:
 
 4. More tests will be present in the final test.py that we will be running
 """
-which_module = [2]
+which_module = [1]
     
 
 class Tests(unittest.TestCase):
@@ -138,13 +138,12 @@ class Tests(unittest.TestCase):
 
         train_input0 = (train_input0[:100].float() / 255.0).requires_grad_()
         train_input1 = (train_input1[:100].float() / 255.0).requires_grad_()
-        val_input = val_input[:100].float() / 255.0
-        val_target = val_target[:100].float() / 255.0
+        val_input = (val_input[:100].float() / 255.0).requires_grad_()
+        val_target = (val_target[:100].float() / 255.0).requires_grad_()
 
         output_psnr_before = self.compute_psnr(val_input, val_target)
-
         model.train(train_input0, train_input1)
-
+        
         mini_batch_size = 100
         model_outputs = []
         for b in tqdm(range(0, val_input.size(0), mini_batch_size)):

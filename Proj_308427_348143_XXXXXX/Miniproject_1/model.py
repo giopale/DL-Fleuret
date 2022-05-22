@@ -157,15 +157,12 @@ class Model(nn.Module):
         # #pre-process
         standardize_dataset(train_input , method='per_image')
         standardize_dataset(train_target, method='per_image')
-        
-
 
         #train
         for epoch in range(self.num_epochs):
             acc_loss = 0
             for inputs, targets in zip(train_input.split(self.batch_size), train_target.split(self.batch_size)):
                 output = self.predict(inputs)
-                print(output.requires_grad)
                 loss   = self.criterion(output, targets)
                 acc_loss += loss.item()
 
@@ -175,7 +172,7 @@ class Model(nn.Module):
 
             if val_input is not None and val_target is not None:
                 mse, psnr = self.validate(val_input, val_target)
-                # self.scheduler.step(mse)
+                #self.scheduler.step(mse)
 
                 if filename is not None:
                     with open(filename, 'a') as file:
