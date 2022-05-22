@@ -152,7 +152,7 @@ class Model(nn.Module):
             if filename is not None:
                 with open(filename, 'a') as file:
                     file.write('Training on {0} epochs:'.format(self.num_epochs)+'\n')
-                    file.write("Epoch:\t Tr_Err:\t  PSNR train [dB]\t  PSNR val [dB]:"+'\n\n')
+                    file.write("Epoch:\t Tr_Err:\t PSNR train [dB]\t Val_Err:\t PSNR val [dB]:"+'\n\n')
 
         # #pre-process
         standardize_dataset(train_input , method='per_image')
@@ -180,7 +180,7 @@ class Model(nn.Module):
 
                 if filename is not None:
                     with open(filename, 'a') as file:
-                        file.write("%d\t %.3f\t  \t %.3f\t %.3f"%(epoch, acc_loss, psnr_train, psnr_val)+'\n')
+                        file.write("%d\t %.3f\t %.3f\t %.3f\t %.3f"%(epoch, acc_loss, psnr_train, mse, psnr_val)+'\n')
 
     #============================
     #           VALIDATE                                            
