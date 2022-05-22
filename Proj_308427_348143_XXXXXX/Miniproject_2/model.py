@@ -115,11 +115,25 @@ def conv_backward(input, dL_dy, weight, stride=1, padding=0, dilation=1):
         #dL_dx = unfold(dL_dx, 1, padding=ignored).reshape(*dL_dx.shape[:2],*[dL_dx.shape[-1]+2*ignored]*2)
         #dL_dx = dL_dx[:,:,ignored:, ignored:]
 
-    xt = input.transpose(0,1) if not ignored else input[:,:,:-ignored, :-ignored].transpose(0,1)
+    xt = input[:,:,:-ignored, :-ignored].transpose(0,1) if ignored else input.transpose(0,1)
     dL_dy_aug = augment(dL_dy, nzeros=stride-1, padding=0).transpose(0,1)
     dL_df = conv2d(xt, dL_dy_aug).transpose(0,1)
     return dL_dx, dL_df
 
+
+def tconv_backward(input, dL_dy, weight, stride=1, padding=0, dilation=1):
+    dL_dx = conv2d(dL_dy, weight, stride=stride, padding=padding, dilation=dilation)
+    
+    ignored = int(input.shape[-1]-dL_dx.shape[-1])
+    if ignored:
+        dL_dx = pad(dL_dx, (0,ignored,0,ignored))
+        #dL_dx = unfold(dL_dx, 1, padding=ignored).reshape(*dL_dx.shape[:2],*[dL_dx.shape[-1]+2*ignored]*2)
+        #dL_dx = dL_dx[:,:,ignored:, ignored:]
+
+    xt = input[:,:,:-ignored, :-ignored].transpose(0,1) if ignored else input.transpose(0,1)
+    xt = augment(xt, nzeros=stride-1, padding=0)
+    dL_df = conv2d(dL_dy.transpose(0,1), xt).transpose(0,1)
+    return dL_dx, dL_df
 
 
 
@@ -213,17 +227,9 @@ class TransposeConv2d(Module):
     __call__ = forward
     
 
-    def forward_and_vjp(self, input):
-        p = self.kernel_size-1-self.padding
-        z = self.stride-1
-        
-        eff_input  = augment(input, nzeros=z, padding=p)
-        eff_weight = self.weight.flip(2,3).transpose(0,1)
-        
+    def forward_and_vjp(self, input):        
         def _vjp(dL_dy):
-            dL_dx, dL_df = conv_backward(eff_input, dL_dy, eff_weight, stride=1, padding=0, dilation=1)
-            dL_df = dL_df.flip(2,3).transpose(0,1)
-            dL_dx = dL_dx[:,:,p:-p:z+1, p:-p:z+1]
+            dL_dx, dL_df = tconv_backward(input, dL_dy, self.weight, stride=self.stride, padding=self.padding, dilation=self.dilation)
             return dL_dx, dL_df, dL_dy.sum((0,2,3))
         return self.forward(input), _vjp
 
