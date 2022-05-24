@@ -325,7 +325,8 @@ class Model():
         self.eta         = 0.75
         self.gamma       = 0.
         self.params_old  = None
-        self.batch_size  = 16
+        self.batch_size  = 32
+        self.num_epochs  = 5
     
         conv1   = Conv2d(in_channels=3, out_channels=self.features, stride=self.stride,  kernel_size=self.kernel_size)
         conv2   = Conv2d(in_channels=self.features, out_channels=self.features, stride=self.stride,  kernel_size=self.kernel_size)
@@ -341,14 +342,16 @@ class Model():
         return self.net.forward(x)
 
 
-    def train(self, train_input, train_target):
+    def train(self, train_input, train_target,filename = None):
         for e in range(self.nb_epochs):
             for inputs, targets in zip(train_input.split(self.batch_size), train_target.split(self.batch_size)):
 
                 dL_dy = self.loss.forward_and_vjp(targets)
                 self.net.forward_and_vjp(inputs, dL_dy)
                 self.SGD()
-            print("\rCompleted: %d/%d"%(e+1,self.nb_epochs), end=' ')
+            if filename is not None:
+                    with open(filename, 'a') as file:
+                        file.write("\rCompleted: %d/%d"%(e+1,self.nb_epochs)+'\n')
         return 
 
 
