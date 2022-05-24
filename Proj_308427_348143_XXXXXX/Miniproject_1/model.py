@@ -17,6 +17,11 @@ def standardize_dataset(dataset, method='per_image'):
     return 
 
 
+def compute_psnr(x, y, max_range=1.0):
+    assert x.shape == y.shape and x.ndim == 4
+    return 20 * torch.log10(torch.tensor(max_range)) - 10 * torch.log10(((x-y) ** 2).mean((1,2,3))).mean()
+
+
 def _init_weights(model):
     if isinstance(model,nn.Conv2d):
         nn.init.kaiming_normal_(model.weight, mode='fan_in', nonlinearity='leaky_relu')
@@ -70,7 +75,7 @@ class Model(nn.Module):
         #       MODEL DEFS
         #============================
 
-        oute       = 16       # nb of channels in encoding layers
+        oute       = 32       # nb of channels in encoding layers
         outd       = 2*oute   # nb ofchannels in middle decoding layers
         ChIm       = 3        # input's nb of channels
         kers       = 3        # fixed kernel size for all convolutional layers
@@ -103,11 +108,11 @@ class Model(nn.Module):
         #============================
 
         self.criterion  = nn.MSELoss()
-        self.batch_size = 32
+        self.batch_size = 16
 
         self.eta        = 0.1
         self.momentum   = 0.9
-        self.weight_decay = 0.0005
+        self.weight_decay = 0.
         self.optimizer  = torch.optim.SGD(self.parameters(), lr=self.eta, \
             momentum=self.momentum, weight_decay=self.weight_decay)
             
@@ -181,7 +186,7 @@ class Model(nn.Module):
         with torch.no_grad():          
             denoised = self.predict(val_input)
             mse = F.mse_loss(denoised, val_target)
-            psnr = (-10 * torch.log10(mse + 10**-8)).item()
+            psnr = compute_psnr(denoised, val_target)
         return mse, psnr
 
 
