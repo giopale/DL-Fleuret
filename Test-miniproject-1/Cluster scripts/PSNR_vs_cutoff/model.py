@@ -70,7 +70,7 @@ class Model(nn.Module):
         #       MODEL DEFS
         #============================
 
-        oute       = 16       # nb of channels in encoding layers
+        oute       = 64       # nb of channels in encoding layers
         outd       = 2*oute   # nb ofchannels in middle decoding layers
         ChIm       = 3        # input's nb of channels
         kers       = 3        # fixed kernel size for all convolutional layers

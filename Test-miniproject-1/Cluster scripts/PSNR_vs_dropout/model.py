@@ -63,21 +63,21 @@ class _Decoder_Block(nn.Module):
 
 class Model(nn.Module):
 
-    def __init__(self):
+    def __init__(self, pdropout):
         super().__init__()
 
         #============================
         #       MODEL DEFS
         #============================
 
-        oute       = 16       # nb of channels in encoding layers
+        oute       = 64       # nb of channels in encoding layers
         outd       = 2*oute   # nb ofchannels in middle decoding layers
         ChIm       = 3        # input's nb of channels
         kers       = 3        # fixed kernel size for all convolutional layers
         nb_elayers = 4        # number of encoding layers 
 
         self.num_epochs = 5
-            
+        self.pdropout   = pdropout
         #ENCODER
         self.conv0 = nn.Conv2d(in_channels=ChIm, out_channels=oute, kernel_size=kers, padding='same')
         self.conv1 = nn.Conv2d(in_channels=oute, out_channels=oute, kernel_size=kers, padding='same')
@@ -93,7 +93,7 @@ class Model(nn.Module):
         
         self.conv2 = nn.Conv2d(in_channels=outd//3, out_channels=ChIm, kernel_size=kers, padding='same')
         self.relu  = nn.ReLU() #nn.LeakyReLU(inplace=True)
-
+        self.drop  = nn.Dropout2d(self.pdropout)
         # WEIGHTS INIT
         # self.apply(_init_weights)
         
@@ -117,6 +117,8 @@ class Model(nn.Module):
         #ENCODER
         pout = [x]
         y = self.relu(self.conv0(x))
+        y = self.drop(y)
+        print(y[0,1])
         for l in self.eblocks[:-1]:
             y = l(y)
             pout.append(y)
