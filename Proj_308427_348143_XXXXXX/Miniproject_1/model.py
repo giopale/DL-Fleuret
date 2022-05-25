@@ -5,11 +5,14 @@ from torch.nn import functional as F
 
     
 def standardize_dataset(dataset, method='per_image'):
-    if dataset.dtype!=torch.float: dataset=dataset.float()
+    if dataset.dtype!=torch.float:
+        dataset=dataset.float()/255.
     if method=='per_image':
         mu  = dataset.mean((-1,-2)).view([*dataset.shape[:2],1,1])
         std = dataset.std((-1, -2)).view([*dataset.shape[:2],1,1])
         dataset.data.sub_(mu).div_(std)
+    elif method=='to_float':
+        pass
     else:
         mu  = dataset.mean(0)
         std = dataset.std(0)
@@ -119,6 +122,7 @@ class Model(nn.Module):
         self.scheduler  = torch.optim.lr_scheduler.ReduceLROnPlateau(self.optimizer, 'min')
 
     def predict(self, x):
+        x=standardize_dataset(x, method='to_float')
         #ENCODER
         pout = [x]
         y = self.relu(self.conv0(x))
