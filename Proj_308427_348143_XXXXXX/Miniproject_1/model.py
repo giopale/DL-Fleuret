@@ -108,7 +108,7 @@ class Model(nn.Module):
         #============================
 
         self.criterion  = nn.MSELoss()
-        self.batch_size = 20
+        self.batch_size = 10
 
         self.eta        = 0.1
         self.momentum   = 0.9
