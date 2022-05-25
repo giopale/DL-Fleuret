@@ -144,7 +144,7 @@ class Module(object):
         self.d_weight = torch.Tensor([])
         self.d_bias   = torch.Tensor([])
         pass
-    def forward (self) :
+    def forward (self,input) :
         raise NotImplementedError
     def forward_and_vjp (self, input):
         raise NotImplementedError
@@ -349,9 +349,10 @@ class Model():
                 dL_dy = self.loss.forward_and_vjp(targets)
                 self.net.forward_and_vjp(inputs, dL_dy)
                 self.SGD()
+                
             if filename is not None:
                     with open(filename, 'a') as file:
-                        file.write("\rCompleted: %d/%d"%(e+1,self.nb_epochs)+'\n')
+                        file.write("Completed: %d/%d"%(e+1,self.nb_epochs)+'\n')
         return 
 
 
@@ -369,7 +370,7 @@ class Model():
 
         #self.params_old = copy.deepcopy(list(self.net.parameters()))
 
-    def save(self, filename) -> None:
+    def save(self, filename='bestmodel.pth') -> None:
         with open(filename, "wb") as fp:
             pickle.dump(self.net.state_dict, fp)
 
