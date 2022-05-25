@@ -342,7 +342,10 @@ class Model():
         return self.net.forward(x)
 
 
-    def train(self, train_input, train_target,filename = None):
+    def train(self, train_input, train_target,filename = None, num_epochs=None):
+
+        if num_epochs is not None: self.nb_epochs = num_epochs
+
         for e in range(self.nb_epochs):
             for inputs, targets in zip(train_input.split(self.batch_size), train_target.split(self.batch_size)):
 

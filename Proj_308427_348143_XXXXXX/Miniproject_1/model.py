@@ -147,11 +147,13 @@ class Model(nn.Module):
     #           TRAIN
     #============================
 
-    def train(self, train_input, train_target, filename=None,  val_input=None, val_target=None,) -> None:
+    def train(self, train_input, train_target, filename=None,  val_input=None, val_target=None, num_epochs=None) -> None:
 
         # pre-process
         standardize_dataset(train_input , method='per_image')
         standardize_dataset(train_target, method='per_image')
+
+        if num_epochs is not None: self.num_epochs = num_epochs
 
         #train
         i = 0
