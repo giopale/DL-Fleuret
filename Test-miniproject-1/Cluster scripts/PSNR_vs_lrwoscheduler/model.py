@@ -17,11 +17,6 @@ def standardize_dataset(dataset, method='per_image'):
     return 
 
 
-def compute_psnr(x, y, max_range=1.0):
-    assert x.shape == y.shape and x.ndim == 4
-    return 20 * torch.log10(torch.tensor(max_range)) - 10 * torch.log10(((x-y) ** 2).mean((1,2,3))).mean()
-
-
 def _init_weights(model):
     if isinstance(model,nn.Conv2d):
         nn.init.kaiming_normal_(model.weight, mode='fan_in', nonlinearity='leaky_relu')
@@ -75,14 +70,13 @@ class Model(nn.Module):
         #       MODEL DEFS
         #============================
 
-        oute       = 32       # nb of channels in encoding layers
+        oute       = 64       # nb of channels in encoding layers
         outd       = 2*oute   # nb ofchannels in middle decoding layers
         ChIm       = 3        # input's nb of channels
         kers       = 3        # fixed kernel size for all convolutional layers
         nb_elayers = 4        # number of encoding layers 
 
         self.num_epochs = 5
-            
         #ENCODER
         self.conv0 = nn.Conv2d(in_channels=ChIm, out_channels=oute, kernel_size=kers, padding='same')
         self.conv1 = nn.Conv2d(in_channels=oute, out_channels=oute, kernel_size=kers, padding='same')
@@ -98,7 +92,6 @@ class Model(nn.Module):
         
         self.conv2 = nn.Conv2d(in_channels=outd//3, out_channels=ChIm, kernel_size=kers, padding='same')
         self.relu  = nn.ReLU() #nn.LeakyReLU(inplace=True)
-
         # WEIGHTS INIT
         # self.apply(_init_weights)
         
@@ -108,15 +101,15 @@ class Model(nn.Module):
         #============================
 
         self.criterion  = nn.MSELoss()
-        self.batch_size = 16
+        self.batch_size = 32
 
         self.eta        = 0.1
         self.momentum   = 0.9
-        self.weight_decay = 0.
+        self.weight_decay = 0.0005
         self.optimizer  = torch.optim.SGD(self.parameters(), lr=self.eta, \
             momentum=self.momentum, weight_decay=self.weight_decay)
             
-        self.scheduler  = torch.optim.lr_scheduler.ReduceLROnPlateau(self.optimizer, 'min')
+        #self.scheduler  = torch.optim.lr_scheduler.ReduceLROnPlateau(self.optimizer, 'min')
 
     def predict(self, x):
         #ENCODER
@@ -168,7 +161,7 @@ class Model(nn.Module):
 
                 if val_input is not None and val_target is not None and i%125==0:
                     mse, psnr = self.validate(val_input, val_target)
-                    self.scheduler.step(mse)
+                    #self.scheduler.step(mse)
 
                     if filename:
                         with open(filename, 'a') as file:
@@ -186,7 +179,7 @@ class Model(nn.Module):
         with torch.no_grad():          
             denoised = self.predict(val_input)
             mse = F.mse_loss(denoised, val_target)
-            psnr = compute_psnr(denoised, val_target)
+            psnr = (-10 * torch.log10(mse + 10**-8)).item()
         return mse, psnr
 
 

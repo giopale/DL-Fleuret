@@ -68,14 +68,13 @@ class _Decoder_Block(nn.Module):
 
 class Model(nn.Module):
 
-    def __init__(self):
+    def __init__(self, oute):
         super().__init__()
 
         #============================
         #       MODEL DEFS
         #============================
 
-        oute       = 32       # nb of channels in encoding layers
         outd       = 2*oute   # nb ofchannels in middle decoding layers
         ChIm       = 3        # input's nb of channels
         kers       = 3        # fixed kernel size for all convolutional layers
