@@ -23,19 +23,18 @@ train_in, train_tg = torch.load('train_data.pkl')
 
 
 cut = int(cut_list[Njob])
-valid_in = valid_in.float()/ 255.
 valid_tg = valid_tg.float()/ 255.
-train_in = train_in[:cut].float()/ 255.
-train_tg = train_tg[:cut].float()/ 255.
+train_in = train_in[:cut]
+train_tg = train_tg[:cut]
 
 
 mod = Model()
 
 mod.num_epochs = epoch_list[Njob]
 mod.batch_size = 16
-mod.eta        = 0.1
-mod.momentum   = 0.9
-mod.weight_decay = 0.0005
+mod.eta        = 1e3
+mod.momentum   = 0.
+mod.weight_decay = 0.
 
 filename = "psnr_cut=%d_nbepochs=%d_bs=16_.txt"%(cut, mod.num_epochs)
-mod.train(train_in, train_tg, val_input=valid_in, val_target=valid_tg, filename=filename)
+mod.train_and_validate(train_in, train_tg, valid_in, valid_tg, filename=filename)
