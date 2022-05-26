@@ -11,7 +11,7 @@
 #SBATCH --cpus-per-task 28
 #SBATCH --mem-per-cpu 4G
 #SBATCH --account=ltpn
-#SBATCH --array=0-5
+#SBATCH --array=0-8
 
 N=${SLURM_ARRAY_TASK_ID}
 

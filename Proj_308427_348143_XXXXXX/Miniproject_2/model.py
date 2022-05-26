@@ -1,6 +1,4 @@
 # Miniproject 2
-
-from email import generator
 import torch, math
 from collections import OrderedDict
 from typing import Dict, Optional
@@ -41,6 +39,21 @@ def _init_weights(model):
     if isinstance(model, Conv2d) or isinstance(model, TransposeConv2d):
         xavier_normal_(model.weight) # model.weight.normal_(0,0.5,generator=torch.manual_seed(0)) #
         constant_(model.bias, 0.)
+
+
+
+
+def compute_psnr(x, y, max_range=1.0):
+    assert x.shape == y.shape and x.ndim == 4
+    return 20 * torch.log10(torch.tensor(max_range)) - 10 * torch.log10(((x-y) ** 2).mean((1,2,3))).mean()
+
+
+
+def process_dataset(data, normalize=False):
+    if data.dtype==torch.uint8: data = data.float()
+    if data.max()>1 and normalize: data = data/255.
+    return data
+
 
 
 def conv2d(X, K, stride=1, padding=0, dilation=1, bias=torch.Tensor([])):
@@ -134,6 +147,9 @@ def tconv_backward(input, dL_dy, weight, stride=1, padding=0, dilation=1):
     xt = augment(xt, nzeros=stride-1, padding=0)
     dL_df = conv2d(dL_dy.transpose(0,1), xt).transpose(0,1)
     return dL_dx, dL_df
+
+
+
 
 
 
@@ -249,6 +265,13 @@ class MSE(Module):
         return dL_dy
 
 
+
+#===========================================================
+#                        SEQUENTIAL                                            
+#===========================================================  
+
+
+
 class Sequential():
     def __init__(self, *args, initialize=True):
         self._modules: Dict[str, Optional['Module']] = OrderedDict()
@@ -318,11 +341,11 @@ class Model():
         self.stride      = 2
         self.kernel_size = 2
         self.features    = 64
-        self.nb_epochs   = 30
+        self.nb_epochs   = 10
 
         self.loss = MSE()
 
-        self.eta         = 0.75
+        self.eta         = 10.
         self.gamma       = 0.
         self.params_old  = None
         self.batch_size  = 32
@@ -339,24 +362,70 @@ class Model():
 
         
     def predict(self,x) -> torch.Tensor:
-        return self.net.forward(x)
+        #PREPROCESS
+        mult = x.max()>1
+        if x.dtype==torch.uint8: x = x.float()
+        if mult: x = x/255.
+
+        #SEQUENTIAL NN
+        x = self.net.forward(x)
+        
+        #POSTPROCESS
+        if mult: x = x*255.
+        return x
 
 
-    def train(self, train_input, train_target,filename = None, num_epochs=None):
-
+    def train(self, train_input, train_target, num_epochs=None, doprint=False) -> None:
         if num_epochs is not None: self.nb_epochs = num_epochs
 
+        # pre-process
+        train_target = process_dataset(train_target, normalize=True)
+
+        #train
         for e in range(self.nb_epochs):
             for inputs, targets in zip(train_input.split(self.batch_size), train_target.split(self.batch_size)):
 
                 dL_dy = self.loss.forward_and_vjp(targets)
-                self.net.forward_and_vjp(inputs, dL_dy)
+                self.net.forward_and_vjp(inputs/255., dL_dy)
                 self.SGD()
-                
-            if filename is not None:
-                    with open(filename, 'a') as file:
-                        file.write("Completed: %d/%d"%(e+1,self.nb_epochs)+'\n')
-        return 
+            if doprint: print("\rCompleted: %d/%d"%(e+1,self.nb_epochs), end=' ')
+
+        return
+
+
+    def validate(self, val_input, val_target):         
+        denoised = self.predict(val_input)/255.
+        psnr = compute_psnr(denoised, val_target)
+        return psnr
+
+
+    def train_and_validate(self, train_input, train_target, val_input, val_target, num_epochs=None, filename=None) -> None:
+        if num_epochs is not None: self.nb_epochs = num_epochs
+
+        # pre-process
+        train_target = process_dataset(train_target, normalize=True)
+        val_input = process_dataset(val_input, normalize=False)
+
+        #train
+        i=0
+        for _ in range(self.nb_epochs):
+            for inputs, targets in zip( train_input.split(self.batch_size), train_target.split(self.batch_size) ):
+
+                dL_dy = self.loss.forward_and_vjp(targets)
+                self.net.forward_and_vjp(inputs/255., dL_dy)
+                self.SGD()
+
+                if i%125==0:
+                    psnr = self.validate(val_input, val_target)
+
+                    if filename:
+                        with open(filename, 'a') as file:
+                            file.write("%d\t %.10f\n"%((i*self.batch_size), psnr))
+                    else:
+                        print("%d\t %.3f"%((i*self.batch_size), psnr))
+                i+=1
+        return
+
 
 
     def SGD(self):
