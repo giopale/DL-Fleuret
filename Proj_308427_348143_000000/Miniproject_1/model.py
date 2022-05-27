@@ -35,8 +35,7 @@ def _init_weights(model):
 class _Encoder_Block(nn.Module):
     def __init__(self, in_channles, out_channels, conv_ksize, maxp_ksize):
         super().__init__()
-        self.conv = nn.Conv2d(in_channels=in_channles, out_channels=out_channels,\
-                            kernel_size=conv_ksize, padding='same')
+        self.conv = nn.Conv2d(in_channels=in_channles, out_channels=out_channels, kernel_size=conv_ksize, padding='same')
         
         self.maxp = nn.MaxPool2d(kernel_size=maxp_ksize)
         self.relu = nn.PReLU(out_channels) #nn.LeakyReLU(inplace=True)
@@ -89,8 +88,8 @@ class Model(nn.Module):
         self.num_epochs = 1
             
         #ENCODER
-        self.conv0 = nn.Conv2d(in_channels=ChIm, out_channels=oute, kernel_size=kers, padding='same',device=self.device)
-        self.conv1 = nn.Conv2d(in_channels=oute, out_channels=oute, kernel_size=kers, padding='same').to(self.device)
+        self.conv0 = nn.Conv2d(in_channels=ChIm, out_channels=oute, kernel_size=kers, padding='same', device=self.device)
+        self.conv1 = nn.Conv2d(in_channels=oute, out_channels=oute, kernel_size=kers, padding='same', device=self.device)
         eblock = _Encoder_Block(in_channles=oute, out_channels=oute, conv_ksize=kers, maxp_ksize=2).to(self.device)
         self.eblocks = nn.ModuleList([eblock]*nb_elayers)
         
@@ -101,7 +100,7 @@ class Model(nn.Module):
         dblock2 = _Decoder_Block(in0=outd+ChIm, in1=outd//2, out1=outd//3, conv_ksize=kers).to(self.device)
         self.dblocks = nn.ModuleList([dblock0] + [dblock1]*(nb_elayers-2) + [dblock2])
         
-        self.conv2 = nn.Conv2d(in_channels=outd//3, out_channels=ChIm, kernel_size=kers, padding='same').to(self.device)
+        self.conv2 = nn.Conv2d(in_channels=outd//3, out_channels=ChIm, kernel_size=kers, padding='same', device=self.device)
         self.relu  = nn.ReLU().to(self.device) #nn.LeakyReLU(inplace=True)
 
         # WEIGHTS INIT
@@ -115,8 +114,8 @@ class Model(nn.Module):
         self.criterion  = nn.MSELoss()
         self.batch_size = 16
 
-        self.eta        = 0.1
-        self.momentum   = 0.9
+        self.eta          = 1.
+        self.momentum     = 0.
         self.weight_decay = 0.
         self.optimizer  = torch.optim.SGD(self.parameters(), lr=self.eta, momentum=self.momentum, weight_decay=self.weight_decay)
         self.scheduler  = torch.optim.lr_scheduler.ReduceLROnPlateau(self.optimizer, 'min')
@@ -187,10 +186,6 @@ class Model(nn.Module):
     #============================        
 
     def validate(self, val_input, val_target):
-
-        # device
-        val_input, val_target = val_input.to(self.device), val_target.to(self.device)
-
         with torch.no_grad():          
             denoised = self.predict(val_input)/255.
             mse = F.mse_loss(denoised, val_target)
