@@ -77,7 +77,6 @@ class Model(nn.Module):
         super().__init__()
 
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        print('Device: ', self.device)
         #============================
         #       MODEL DEFS
         #============================
@@ -125,8 +124,6 @@ class Model(nn.Module):
     def predict(self, x):
         #DEVICE
         x = x.to(self.device)
-        print('x: ', x.get_device())
-        print('self.conv0: ', self.conv0.weight.get_device())
 
         #PROCESSING
         mult = x.max()>1
