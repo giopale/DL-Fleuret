@@ -84,8 +84,6 @@ class Model(nn.Module):
         ChIm       = 3        # input's nb of channels
         kers       = 3        # fixed kernel size for all convolutional layers
         nb_elayers = 4        # number of encoding layers 
-
-        self.num_epochs = 1
             
         #ENCODER
         self.conv0 = nn.Conv2d(in_channels=ChIm, out_channels=oute, kernel_size=kers, padding='same', device=self.device)
@@ -110,9 +108,9 @@ class Model(nn.Module):
         #============================
         #       TRAINING DEFS
         #============================
-
         self.criterion  = nn.MSELoss()
         self.batch_size = 16
+        self.num_epochs = 5
 
         self.eta          = 1.
         self.momentum     = 0.
@@ -120,6 +118,10 @@ class Model(nn.Module):
         self.optimizer  = torch.optim.SGD(self.parameters(), lr=self.eta, momentum=self.momentum, weight_decay=self.weight_decay)
         self.scheduler  = torch.optim.lr_scheduler.ReduceLROnPlateau(self.optimizer, 'min')
 
+
+    #============================
+    #          FORWARD
+    #============================
     def predict(self, x):
         #DEVICE
         x = x.to(self.device)
@@ -148,17 +150,9 @@ class Model(nn.Module):
         return y
 
 
-#==================================================================================================================#
-#==================================================================================================================#
-#                                               TRAINING
-#==================================================================================================================#
-#==================================================================================================================#
-
-
     #============================
     #           TRAIN
     #============================
-
     def train(self, train_input, train_target, num_epochs=None) -> None:
         if num_epochs is not None: self.num_epochs = num_epochs
 
@@ -184,7 +178,6 @@ class Model(nn.Module):
     #============================
     #           VALIDATE                                            
     #============================        
-
     def validate(self, val_input, val_target):
         with torch.no_grad():          
             denoised = self.predict(val_input)/255.
@@ -228,18 +221,12 @@ class Model(nn.Module):
                         print("%d\t %.3f\t %.3f"%((i*self.batch_size), mse, psnr))
                 i+=1
 
-
-
-#==================================================================================================================#
-#==================================================================================================================#
-#                                               LOADERS
-#==================================================================================================================#
-#==================================================================================================================#
-
-
+    #==============================================
+    #               LOADERS                         
+    #==============================================
     def save(self, filename) -> None:
         torch.save(self.state_dict(), filename)
 
-    def load_pretrained_model(self, filename='Proj_308427_348143_XXXXXX/Miniproject_1/bestmodel.pth') -> None:
+    def load_pretrained_model(self, filename='Proj_308427_348143_000000/Miniproject_1/bestmodel.pth') -> None:
         self.load_state_dict(torch.load(filename))
 

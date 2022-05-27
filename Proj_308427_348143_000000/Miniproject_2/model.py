@@ -5,6 +5,15 @@ from typing import Dict, Optional
 from torch.nn.functional import fold, unfold, pad
 import pickle, copy
 
+
+
+#==================================================================================================================#
+#==================================================================================================================#
+#                                               INITIALIZERS
+#==================================================================================================================#
+#==================================================================================================================#
+
+
 def _calculate_fan_in_and_fan_out(tensor):
     dimensions = tensor.dim()
     assert dimensions >= 2
@@ -39,6 +48,13 @@ def _init_weights(model):
         constant_(model.bias, 0.)
 
 
+
+
+#==================================================================================================================#
+#==================================================================================================================#
+#                                                  FUNCTIONALS
+#==================================================================================================================#
+#==================================================================================================================#
 
 
 def compute_psnr(x, y, max_range=1.0):
@@ -150,6 +166,12 @@ def tconv_backward(input, dL_dy, weight, stride=1, padding=0, dilation=1):
 
 
 
+
+#==================================================================================================================#
+#==================================================================================================================#
+#                                                   MODULES
+#==================================================================================================================#
+#==================================================================================================================#
 
 class Module(object):
     def __init__(self):
@@ -264,10 +286,11 @@ class MSE(Module):
 
 
 
-#===========================================================
-#                        SEQUENTIAL                                            
-#===========================================================  
-
+#==================================================================================================================#
+#==================================================================================================================#
+#                                               SEQUENTIAL CONTAINER
+#==================================================================================================================#
+#==================================================================================================================#
 
 
 class Sequential():
@@ -328,26 +351,25 @@ class Sequential():
 
 
 
-#===========================================================
-#                          MODEL                                            
-#===========================================================  
+#==================================================================================================================#
+#==================================================================================================================#
+#                                                   MODEL
+#==================================================================================================================#
+#==================================================================================================================#
 
 
 class Model():
 
     def __init__(self) -> None:
+        #============================
+        #       MODEL DEFS
+        #============================
         self.stride      = 2
         self.kernel_size = 2
         self.features    = 64
         self.nb_epochs   = 10
 
         self.loss = MSE()
-
-        self.eta         = 10.
-        self.gamma       = 0.
-        self.params_old  = None
-        self.batch_size  = 32
-        self.num_epochs  = 5
     
         conv1   = Conv2d(in_channels=3, out_channels=self.features, stride=self.stride,  kernel_size=self.kernel_size)
         conv2   = Conv2d(in_channels=self.features, out_channels=self.features, stride=self.stride,  kernel_size=self.kernel_size)
@@ -358,7 +380,19 @@ class Model():
 
         self.net = Sequential(conv1, relu, conv2, relu, tconv1, relu, tconv2, sigmoid, initialize=True)
 
-        
+        #============================
+        #       TRAINING DEFS
+        #============================
+        self.eta         = 10.
+        self.gamma       = 0.
+        self.params_old  = None
+        self.batch_size  = 32
+        self.num_epochs  = 5
+
+
+    #============================
+    #          FORWARD
+    #============================
     def predict(self,x) -> torch.Tensor:
         #PREPROCESS
         mult = x.max()>1
@@ -372,8 +406,10 @@ class Model():
         if mult: x = x*255.
         return x
 
-
-    def train(self, train_input, train_target, num_epochs=None, doprint=False) -> None:
+    #============================
+    #            TRAIN
+    #============================
+    def train(self, train_input, train_target, num_epochs=None) -> None:
         if num_epochs is not None: self.nb_epochs = num_epochs
 
         # pre-process
@@ -386,11 +422,11 @@ class Model():
                 dL_dy = self.loss.forward_and_vjp(targets)
                 self.net.forward_and_vjp(inputs/255., dL_dy)
                 self.SGD()
-            if doprint: print("\rCompleted: %d/%d"%(e+1,self.nb_epochs), end=' ')
-
         return
 
-
+    #============================
+    #          VALIDATE
+    #============================
     def validate(self, val_input, val_target):         
         denoised = self.predict(val_input)/255.
         psnr = compute_psnr(denoised, val_target)
@@ -425,10 +461,11 @@ class Model():
         return
 
 
-
+    #============================
+    #             SGD
+    #============================
     def SGD(self):
-        for _, p in self.net.parameters():
-                        
+        for _, p in self.net.parameters():           
             #if self.params_old:
             grad_w = self.eta * p[2]
             grad_b = self.eta * p[3]
@@ -440,11 +477,15 @@ class Model():
 
         #self.params_old = copy.deepcopy(list(self.net.parameters()))
 
+
+    #============================
+    #           LOADERS
+    #============================
     def save(self, filename='bestmodel.pth') -> None:
         with open(filename, "wb") as fp:
             pickle.dump(self.net.state_dict, fp)
 
-    def load_pretrained_model(self, filename='Proj_308427_348143_XXXXXX/Miniproject_2/bestmodel.pth') -> None:
+    def load_pretrained_model(self, filename='Proj_308427_348143_000000/Miniproject_2/bestmodel.pth') -> None:
         with open(filename, "rb") as fp:
             state_dict = pickle.load(fp)
         self.net.load_state_dict(state_dict)
