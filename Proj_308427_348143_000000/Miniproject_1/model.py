@@ -227,5 +227,5 @@ class Model(nn.Module):
         torch.save(self.state_dict(), filename)
 
     def load_pretrained_model(self, filename='Proj_308427_348143_000000/Miniproject_1/bestmodel.pth') -> None:
-        self.load_state_dict(torch.load(filename))
+        self.load_state_dict(torch.load(filename, map_location=self.device))
 
