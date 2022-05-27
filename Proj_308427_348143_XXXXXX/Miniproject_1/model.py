@@ -90,7 +90,7 @@ class Model(nn.Module):
         self.num_epochs = 1
             
         #ENCODER
-        self.conv0 = nn.Conv2d(in_channels=ChIm, out_channels=oute, kernel_size=kers, padding='same').to(self.device)
+        self.conv0 = nn.Conv2d(in_channels=ChIm, out_channels=oute, kernel_size=kers, padding='same',device=device)
         self.conv1 = nn.Conv2d(in_channels=oute, out_channels=oute, kernel_size=kers, padding='same').to(self.device)
         eblock = _Encoder_Block(in_channles=oute, out_channels=oute, conv_ksize=kers, maxp_ksize=2).to(self.device)
         self.eblocks = nn.ModuleList([eblock]*nb_elayers)
