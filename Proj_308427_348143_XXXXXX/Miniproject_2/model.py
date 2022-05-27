@@ -5,8 +5,6 @@ from typing import Dict, Optional
 from torch.nn.functional import fold, unfold, pad
 import pickle, copy
 
-torch.set_grad_enabled(False)
-
 def _calculate_fan_in_and_fan_out(tensor):
     dimensions = tensor.dim()
     assert dimensions >= 2

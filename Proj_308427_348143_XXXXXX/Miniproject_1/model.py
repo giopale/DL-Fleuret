@@ -35,11 +35,9 @@ def _init_weights(model):
 class _Encoder_Block(nn.Module):
     def __init__(self, in_channles, out_channels, conv_ksize, maxp_ksize):
         super().__init__()
-        self.conv = nn.Conv2d(in_channels=in_channles, out_channels=out_channels,\
-                            kernel_size=conv_ksize, padding='same')
-        
+        self.conv = nn.Conv2d(in_channels=in_channles, out_channels=out_channels, kernel_size=conv_ksize, padding='same')
         self.maxp = nn.MaxPool2d(kernel_size=maxp_ksize)
-        self.relu = nn.PReLU(out_channels) #nn.LeakyReLU(inplace=True)
+        self.relu = nn.PReLU(out_channels) 
         
     def forward(self, x):
         x = self.relu(self.conv(x)) #convolution
