@@ -35,9 +35,11 @@ def _init_weights(model):
 class _Encoder_Block(nn.Module):
     def __init__(self, in_channles, out_channels, conv_ksize, maxp_ksize):
         super().__init__()
-        self.conv = nn.Conv2d(in_channels=in_channles, out_channels=out_channels, kernel_size=conv_ksize, padding='same')
+        self.conv = nn.Conv2d(in_channels=in_channles, out_channels=out_channels,\
+                            kernel_size=conv_ksize, padding='same')
+        
         self.maxp = nn.MaxPool2d(kernel_size=maxp_ksize)
-        self.relu = nn.PReLU(out_channels) 
+        self.relu = nn.PReLU(out_channels) #nn.LeakyReLU(inplace=True)
         
     def forward(self, x):
         x = self.relu(self.conv(x)) #convolution
@@ -77,8 +79,7 @@ class Model(nn.Module):
         #============================
         #       MODEL DEFS
         #============================
-
-        oute       = 32       # nb of channels in encoding layers
+        oute       = 32
         outd       = 2*oute   # nb ofchannels in middle decoding layers
         ChIm       = 3        # input's nb of channels
         kers       = 3        # fixed kernel size for all convolutional layers
@@ -113,8 +114,8 @@ class Model(nn.Module):
         self.criterion  = nn.MSELoss()
         self.batch_size = 16
 
-        self.eta        = 1e3
-        self.momentum   = 0.
+        self.eta        = 0.1
+        self.momentum   = 0.9
         self.weight_decay = 0.
         self.optimizer  = torch.optim.SGD(self.parameters(), lr=self.eta, momentum=self.momentum, weight_decay=self.weight_decay)
         self.scheduler  = torch.optim.lr_scheduler.ReduceLROnPlateau(self.optimizer, 'min')
@@ -231,3 +232,4 @@ class Model(nn.Module):
 
     def load_pretrained_model(self, filename='Proj_308427_348143_XXXXXX/Miniproject_1/bestmodel.pth') -> None:
         self.load_state_dict(torch.load(filename))
+
