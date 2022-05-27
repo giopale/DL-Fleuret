@@ -8,7 +8,7 @@ from torch.nn import functional as F
 from model import *
 
 
-eta_list = np.array([1e-4, 1e-3, 1e-2, 5e-2, 1e-1, 5e-1])
+eta_list = np.array([1e-3, 1e-2, 1e-1, 1e-0, 1e1, 1e2, 1e3, 1e4])
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--Njob', dest='Njob', type=float, help='Add Njob')
@@ -21,10 +21,9 @@ train_in, train_tg = torch.load('train_data.pkl')
 
 
 cut = 50000
-valid_in = valid_in.float()/ 255.
 valid_tg = valid_tg.float()/ 255.
-train_in = train_in[:cut].float()/ 255.
-train_tg = train_tg[:cut].float()/ 255.
+train_in = train_in[:cut]
+train_tg = train_tg[:cut]
 
 
 mod = Model()

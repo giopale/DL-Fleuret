@@ -16,6 +16,11 @@ def standardize_dataset(dataset, method='per_image'):
         dataset.data.sub_(mu).div_(std)
     return 
 
+def process_dataset(data, normalize=False):
+    if data.dtype==torch.uint8: data = data.float()
+    if data.max()>1 and normalize: data = data/255.
+    return data
+
 
 def compute_psnr(x, y, max_range=1.0):
     assert x.shape == y.shape and x.ndim == 4
@@ -81,7 +86,7 @@ class Model(nn.Module):
         kers       = 3        # fixed kernel size for all convolutional layers
         nb_elayers = 4        # number of encoding layers 
 
-        self.num_epochs = 5
+        self.num_epochs = 1
             
         #ENCODER
         self.conv0 = nn.Conv2d(in_channels=ChIm, out_channels=oute, kernel_size=kers, padding='same')
@@ -113,12 +118,15 @@ class Model(nn.Module):
         self.eta        = 0.1
         self.momentum   = 0.9
         self.weight_decay = 0.
-        self.optimizer  = torch.optim.SGD(self.parameters(), lr=self.eta, \
-            momentum=self.momentum, weight_decay=self.weight_decay)
-            
+        self.optimizer  = torch.optim.SGD(self.parameters(), lr=self.eta, momentum=self.momentum, weight_decay=self.weight_decay)
         self.scheduler  = torch.optim.lr_scheduler.ReduceLROnPlateau(self.optimizer, 'min')
 
     def predict(self, x):
+        #PROCESSING
+        mult = x.max()>1
+        if x.dtype==torch.uint8: x = x.float()
+        if mult: x = x/255.
+
         #ENCODER
         pout = [x]
         y = self.relu(self.conv0(x))
@@ -132,8 +140,10 @@ class Model(nn.Module):
         for i,l in enumerate(self.dblocks):
             y = l(y, pout[-(i+1)])
         y = torch.sigmoid(self.conv2(y))
+        
+        #POSTPROCESSING
+        if mult: y = y*255.
         return y
-
 
 
 #==================================================================================================================#
@@ -147,47 +157,68 @@ class Model(nn.Module):
     #           TRAIN
     #============================
 
-    def train(self, train_input, train_target, filename=None,  val_input=None, val_target=None,) -> None:
+    def train(self, train_input, train_target, num_epochs=None) -> None:
+        if num_epochs is not None: self.num_epochs = num_epochs
 
         # pre-process
         standardize_dataset(train_input , method='per_image')
         standardize_dataset(train_target, method='per_image')
+        train_target = process_dataset(train_target, normalize=False)
 
         #train
-        i = 0
         for epoch in range(self.num_epochs):
-            acc_loss = 0
             for inputs, targets in zip(train_input.split(self.batch_size), train_target.split(self.batch_size)):
                 output = self.predict(inputs)
-                loss   = self.criterion(output, targets)
-                acc_loss += loss
+                loss   = self.criterion(output/255., targets/255.).requires_grad_()
 
                 self.optimizer.zero_grad()
                 loss.backward()
                 self.optimizer.step()
 
-                if val_input is not None and val_target is not None and i%125==0:
-                    mse, psnr = self.validate(val_input, val_target)
-                    self.scheduler.step(mse)
 
-                    if filename:
-                        with open(filename, 'a') as file:
-                            file.write("%d\t %.10f\t %.10f\t %.10f\n"%((i*self.batch_size), acc_loss, mse, psnr))
-                    else:
-                        print("%d\t %.3f\t %.3f\t %.3f"%((i*self.batch_size), acc_loss, mse, psnr))
-                    acc_loss=0
-                
-                i+=1
     #============================
     #           VALIDATE                                            
     #============================        
 
     def validate(self, val_input, val_target):
         with torch.no_grad():          
-            denoised = self.predict(val_input)
+            denoised = self.predict(val_input)/255.
             mse = F.mse_loss(denoised, val_target)
             psnr = compute_psnr(denoised, val_target)
         return mse, psnr
+
+
+    def train_and_validate(self, train_input, train_target, val_input, val_target, num_epochs=None, filename=None) -> None:
+        if num_epochs is not None: self.num_epochs = num_epochs
+
+        # pre-process
+        standardize_dataset(train_input , method='per_image')
+        standardize_dataset(train_target, method='per_image')
+        train_target = process_dataset(train_target, normalize=False)
+        val_target   = process_dataset(val_target, normalize=True)
+
+        #train
+        i=0
+        for _ in range(self.num_epochs):
+            for inputs, targets in zip(train_input.split(self.batch_size), train_target.split(self.batch_size)):
+                output = self.predict(inputs)
+                loss   = self.criterion(output/255., targets/255.).requires_grad_()
+
+                self.optimizer.zero_grad()
+                loss.backward()
+                self.optimizer.step()
+
+                if i%125==0:
+                    mse, psnr = self.validate(val_input, val_target)
+                    self.scheduler.step(mse)
+
+                    if filename:
+                        with open(filename, 'a') as file:
+                            file.write("%d\t %.10f\t %.10f\n"%((i*self.batch_size), mse, psnr))
+                    else:
+                        print("%d\t %.3f\t %.3f"%((i*self.batch_size), mse, psnr))
+                i+=1
+
 
 
 #==================================================================================================================#
@@ -201,5 +232,4 @@ class Model(nn.Module):
         torch.save(self.state_dict(), filename)
 
     def load_pretrained_model(self, filename='Proj_308427_348143_XXXXXX/Miniproject_1/bestmodel.pth') -> None:
-        new_model = torch.load(filename)
-        self=new_model
+        self.load_state_dict(torch.load(filename))

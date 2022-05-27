@@ -37,6 +37,8 @@ Note to students:
 4. More tests will be present in the final test.py that we will be running
 """
 
+model_select = [1,2]
+
 class Tests(unittest.TestCase):
     @staticmethod
     def compute_psnr(x, y, max_range=1.0):
@@ -64,7 +66,7 @@ class Tests(unittest.TestCase):
 
     def test_instantiate_model_class(self):
         title("Testing model class instantiation")
-        for i in [1,2]:
+        for i in model_select:
             with self.subTest(f"Checking instantiate model class for project {i}"):
                 self._test_instantiate_model_class(i)
 
@@ -75,7 +77,7 @@ class Tests(unittest.TestCase):
 
     def test_forward_dummy_input(self):
         title("Testing forward dummy input")
-        for i in [1,2]:
+        for i in model_select:
             with self.subTest(f"Checking forward dummy input for project {i}"):
                 self._test_forward_dummy_input(i)
 
@@ -93,7 +95,7 @@ class Tests(unittest.TestCase):
 
     def test_model_pnsr(self):
         title("Testing pretrained model")
-        for i in [1,2]:
+        for i in model_select:
             with self.subTest(f"Testing pretrained model for project {i}"):
                 self._test_model_pnsr(i)
 
@@ -119,7 +121,7 @@ class Tests(unittest.TestCase):
 
     def test_train_model(self):
         title("Testing model training")
-        for i in [1,2]:
+        for i in model_select:
             with self.subTest(f"Testing model training for project {i}"):
                 self._test_train_model(i)
 
@@ -159,7 +161,7 @@ class Tests(unittest.TestCase):
         with self.subTest("Testing convolution"):
             Conv2d = model_module.Conv2d
             conv = Conv2d(3, 3, 3)
-            self.assertTrue(torch.allclose(conv.forward(x), F.conv2d(x, conv.weight, conv.bias)))
+            self.assertTrue(torch.allclose(conv.forward(x), F.conv2d(x, conv.weight, conv.bias), rtol=1e-4))
 
         with self.subTest("Testing sigmoid"):
             Sigmoid = model_module.Sigmoid
