@@ -125,6 +125,9 @@ class Model(nn.Module):
     def predict(self, x):
         #DEVICE
         x.to(self.device)
+        print('x: ', x.get_device())
+        print('self.conv0: ', self.conv0.get_device())
+
         #PROCESSING
         mult = x.max()>1
         if x.dtype==torch.uint8: x = x.float()
@@ -132,17 +135,17 @@ class Model(nn.Module):
 
         #ENCODER
         pout = [x]
-        y = self.relu(self.conv0(x).to(self.device))
+        y = self.relu(self.conv0(x))
         for l in self.eblocks[:-1]:
             y = l(y)
             pout.append(y)
         y = self.eblocks[-1](y)
-        y = self.relu(self.conv1(y).to(self.device))
+        y = self.relu(self.conv1(y))
         
         #DECODER
         for i,l in enumerate(self.dblocks):
             y = l(y, pout[-(i+1)])
-        y = torch.sigmoid(self.conv2(y).to(self.device)).to(self.device)
+        y = torch.sigmoid(self.conv2(y))
         
         #POSTPROCESSING
         if mult: y = y*255.
