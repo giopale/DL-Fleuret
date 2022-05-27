@@ -103,7 +103,7 @@ class Model(nn.Module):
         self.dblocks = nn.ModuleList([dblock0] + [dblock1]*(nb_elayers-2) + [dblock2])
         
         self.conv2 = nn.Conv2d(in_channels=outd//3, out_channels=ChIm, kernel_size=kers, padding='same').to(self.device)
-        self.relu  = nn.ReLU() #nn.LeakyReLU(inplace=True)
+        self.relu  = nn.ReLU().to(self.device) #nn.LeakyReLU(inplace=True)
 
         # WEIGHTS INIT
         # self.apply(_init_weights)
@@ -132,17 +132,17 @@ class Model(nn.Module):
 
         #ENCODER
         pout = [x]
-        y = self.relu(self.conv0(x))
+        y = self.relu(self.conv0(x).to(self.device))
         for l in self.eblocks[:-1]:
             y = l(y)
             pout.append(y)
         y = self.eblocks[-1](y)
-        y = self.relu(self.conv1(y))
+        y = self.relu(self.conv1(y).to(self.device))
         
         #DECODER
         for i,l in enumerate(self.dblocks):
             y = l(y, pout[-(i+1)])
-        y = torch.sigmoid(self.conv2(y))
+        y = torch.sigmoid(self.conv2(y).to(self.device)).to(self.device)
         
         #POSTPROCESSING
         if mult: y = y*255.
