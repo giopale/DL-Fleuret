@@ -194,12 +194,12 @@ class ReLU(Module):
         return 
 
     def forward(self, input):
-        return torch.relu(input)#torch.threshold(input,0,0)
+        return (input>0.)*input#torch.relu(input)#torch.threshold(input,0,0)
     __call__ = forward
 
     def forward_and_vjp(self, input):
         def _vjp(dL_dy):
-            return (dL_dy*(input > 0), torch.Tensor([]), torch.Tensor([]))
+            return (dL_dy*(input>0.), torch.Tensor([]), torch.Tensor([]))
         return self.forward(input), _vjp
 
 
@@ -209,12 +209,12 @@ class Sigmoid(Module):
         return 
 
     def forward(self,input):
-        return torch.sigmoid(input)
+        return input.sigmoid()
     __call__ = forward
 
     def forward_and_vjp(self, input):
         def _vjp(dL_dy):
-            dsigma_dx = torch.sigmoid(input)*(1.-torch.sigmoid(input))
+            dsigma_dx = input.sigmoid()*(1.-input.sigmoid())
             return (dL_dy*dsigma_dx , torch.Tensor([]), torch.Tensor([]))
         return self.forward(input), _vjp
 
