@@ -126,7 +126,7 @@ class Model(nn.Module):
         #DEVICE
         x.to(self.device)
         print('x: ', x.get_device())
-        print('self.conv0: ', self.conv0.veight.get_device())
+        print('self.conv0: ', self.conv0.weight.get_device())
 
         #PROCESSING
         mult = x.max()>1
