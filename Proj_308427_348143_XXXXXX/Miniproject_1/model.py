@@ -76,8 +76,8 @@ class Model(nn.Module):
     def __init__(self):
         super().__init__()
 
-        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        print('Device: ', device)
+        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        print('Device: ', self.device)
         #============================
         #       MODEL DEFS
         #============================
@@ -90,19 +90,19 @@ class Model(nn.Module):
         self.num_epochs = 1
             
         #ENCODER
-        self.conv0 = nn.Conv2d(in_channels=ChIm, out_channels=oute, kernel_size=kers, padding='same').to(device)
-        self.conv1 = nn.Conv2d(in_channels=oute, out_channels=oute, kernel_size=kers, padding='same').to(device)
-        eblock = _Encoder_Block(in_channles=oute, out_channels=oute, conv_ksize=kers, maxp_ksize=2).to(device)
+        self.conv0 = nn.Conv2d(in_channels=ChIm, out_channels=oute, kernel_size=kers, padding='same').to(self.device)
+        self.conv1 = nn.Conv2d(in_channels=oute, out_channels=oute, kernel_size=kers, padding='same').to(self.device)
+        eblock = _Encoder_Block(in_channles=oute, out_channels=oute, conv_ksize=kers, maxp_ksize=2).to(self.device)
         self.eblocks = nn.ModuleList([eblock]*nb_elayers)
         
         
         #DECODER
-        dblock0 = _Decoder_Block(in0=2*oute, in1=outd, out1=outd, conv_ksize=kers).to(device)
-        dblock1 = _Decoder_Block(in0=outd+oute, in1=outd, out1=outd, conv_ksize=kers).to(device)
-        dblock2 = _Decoder_Block(in0=outd+ChIm, in1=outd//2, out1=outd//3, conv_ksize=kers).to(device)
+        dblock0 = _Decoder_Block(in0=2*oute, in1=outd, out1=outd, conv_ksize=kers).to(self.device)
+        dblock1 = _Decoder_Block(in0=outd+oute, in1=outd, out1=outd, conv_ksize=kers).to(self.device)
+        dblock2 = _Decoder_Block(in0=outd+ChIm, in1=outd//2, out1=outd//3, conv_ksize=kers).to(self.device)
         self.dblocks = nn.ModuleList([dblock0] + [dblock1]*(nb_elayers-2) + [dblock2])
         
-        self.conv2 = nn.Conv2d(in_channels=outd//3, out_channels=ChIm, kernel_size=kers, padding='same').to(device)
+        self.conv2 = nn.Conv2d(in_channels=outd//3, out_channels=ChIm, kernel_size=kers, padding='same').to(self.device)
         self.relu  = nn.ReLU() #nn.LeakyReLU(inplace=True)
 
         # WEIGHTS INIT
@@ -123,6 +123,8 @@ class Model(nn.Module):
         self.scheduler  = torch.optim.lr_scheduler.ReduceLROnPlateau(self.optimizer, 'min')
 
     def predict(self, x):
+        #DEVICE
+        x.to(self.device)
         #PROCESSING
         mult = x.max()>1
         if x.dtype==torch.uint8: x = x.float()
@@ -161,6 +163,9 @@ class Model(nn.Module):
     def train(self, train_input, train_target, num_epochs=None) -> None:
         if num_epochs is not None: self.num_epochs = num_epochs
 
+        # device
+        train_input, train_target = train_input.to(self.device), train_target(self.device)
+
         # pre-process
         standardize_dataset(train_input , method='per_image')
         standardize_dataset(train_target, method='per_image')
@@ -182,6 +187,10 @@ class Model(nn.Module):
     #============================        
 
     def validate(self, val_input, val_target):
+
+        # device
+        val_input, val_target = val_input.to(self.device), val_target.to(self.device)
+
         with torch.no_grad():          
             denoised = self.predict(val_input)/255.
             mse = F.mse_loss(denoised, val_target)
@@ -191,6 +200,10 @@ class Model(nn.Module):
 
     def train_and_validate(self, train_input, train_target, val_input, val_target, num_epochs=None, filename=None) -> None:
         if num_epochs is not None: self.num_epochs = num_epochs
+
+        # device
+        train_input, train_target = train_input.to(self.device), train_target(self.device)
+        val_input, val_target = val_input.to(self.device), val_target.to(self.device)
 
         # pre-process
         standardize_dataset(train_input , method='per_image')
