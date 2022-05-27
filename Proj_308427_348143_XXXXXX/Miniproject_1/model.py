@@ -124,7 +124,7 @@ class Model(nn.Module):
 
     def predict(self, x):
         #DEVICE
-        x.to('cuda')
+        x = x.to(self.device)
         print('x: ', x.get_device())
         print('self.conv0: ', self.conv0.weight.get_device())
 
