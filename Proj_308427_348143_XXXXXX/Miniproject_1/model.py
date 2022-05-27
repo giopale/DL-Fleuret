@@ -76,6 +76,8 @@ class Model(nn.Module):
     def __init__(self):
         super().__init__()
 
+        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        print('Device: ', device)
         #============================
         #       MODEL DEFS
         #============================
@@ -88,19 +90,19 @@ class Model(nn.Module):
         self.num_epochs = 1
             
         #ENCODER
-        self.conv0 = nn.Conv2d(in_channels=ChIm, out_channels=oute, kernel_size=kers, padding='same')
-        self.conv1 = nn.Conv2d(in_channels=oute, out_channels=oute, kernel_size=kers, padding='same')
-        eblock = _Encoder_Block(in_channles=oute, out_channels=oute, conv_ksize=kers, maxp_ksize=2)
+        self.conv0 = nn.Conv2d(in_channels=ChIm, out_channels=oute, kernel_size=kers, padding='same').to(device)
+        self.conv1 = nn.Conv2d(in_channels=oute, out_channels=oute, kernel_size=kers, padding='same').to(device)
+        eblock = _Encoder_Block(in_channles=oute, out_channels=oute, conv_ksize=kers, maxp_ksize=2).to(device)
         self.eblocks = nn.ModuleList([eblock]*nb_elayers)
         
         
         #DECODER
-        dblock0 = _Decoder_Block(in0=2*oute, in1=outd, out1=outd, conv_ksize=kers)
-        dblock1 = _Decoder_Block(in0=outd+oute, in1=outd, out1=outd, conv_ksize=kers)
-        dblock2 = _Decoder_Block(in0=outd+ChIm, in1=outd//2, out1=outd//3, conv_ksize=kers)
+        dblock0 = _Decoder_Block(in0=2*oute, in1=outd, out1=outd, conv_ksize=kers).to(device)
+        dblock1 = _Decoder_Block(in0=outd+oute, in1=outd, out1=outd, conv_ksize=kers).to(device)
+        dblock2 = _Decoder_Block(in0=outd+ChIm, in1=outd//2, out1=outd//3, conv_ksize=kers).to(device)
         self.dblocks = nn.ModuleList([dblock0] + [dblock1]*(nb_elayers-2) + [dblock2])
         
-        self.conv2 = nn.Conv2d(in_channels=outd//3, out_channels=ChIm, kernel_size=kers, padding='same')
+        self.conv2 = nn.Conv2d(in_channels=outd//3, out_channels=ChIm, kernel_size=kers, padding='same').to(device)
         self.relu  = nn.ReLU() #nn.LeakyReLU(inplace=True)
 
         # WEIGHTS INIT
