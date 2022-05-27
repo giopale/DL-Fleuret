@@ -6,7 +6,6 @@ from torch.nn.functional import fold, unfold, pad
 import pickle, copy
 
 
-
 #==================================================================================================================#
 #==================================================================================================================#
 #                                               INITIALIZERS
@@ -220,7 +219,7 @@ class Sigmoid(Module):
 
 
 class Conv2d(Module):
-    def __init__(self, in_channels, out_channels, kernel_size, stride=1, padding=0, dilation=1, initialize=False):
+    def __init__(self, in_channels, out_channels, kernel_size, stride=1, padding=0, dilation=1, initialize=True):
         super().__init__()
         self.in_channels  = in_channels
         self.out_channels = out_channels
@@ -245,7 +244,7 @@ class Conv2d(Module):
             
     
 class TransposeConv2d(Module):
-    def __init__(self, in_channels, out_channels, kernel_size, stride=1, padding=0, dilation=1, initialize=False):
+    def __init__(self, in_channels, out_channels, kernel_size, stride=1, padding=0, dilation=1, initialize=True):
         super().__init__()
         self.in_channels  = in_channels
         self.out_channels = out_channels

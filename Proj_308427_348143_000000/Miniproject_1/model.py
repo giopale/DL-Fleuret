@@ -190,7 +190,7 @@ class Model(nn.Module):
         if num_epochs is not None: self.num_epochs = num_epochs
 
         # device
-        train_input, train_target = train_input.to(self.device), train_target(self.device)
+        train_input, train_target = train_input.to(self.device), train_target.to(self.device)
         val_input, val_target = val_input.to(self.device), val_target.to(self.device)
 
         # pre-process
