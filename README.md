@@ -135,10 +135,7 @@ $$
 (Y^{\beta})_{mn} = (X \circledast f)^{\beta}_{mn} = \sum_{\alpha} \sum_{i,j} f_{ij}^{\alpha\beta}\,(X^{\mu})_{m+i, n+j}^{\alpha}
 $$
 
-with:
-- $i\in[0, h-1]$
-- $j \in [0,w-1]$  
-- $\beta\in[0,D-1]$
+with: $i\in[0, h-1]$, $j \in [0,w-1]$, $\beta\in[0,D-1]$.
 
 Given a loss function $\mathcal{L}$ evaluated on the output of a convolution layer $(Y^{\alpha})_{kl}$, its derivative with respect to the convolution's input $(X^{\mu})_{mn}^{\alpha}$ and weights $f_{ij}^{\alpha\beta}$ is found to be:
 
