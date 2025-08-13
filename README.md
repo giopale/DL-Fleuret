@@ -131,13 +131,15 @@ The simple sequential network shown in Figure 1, composed of two convolutional l
 
 
 
-A set of $N$ digital images $X^{\mu}$ ($\mu = 1,\dots, N$) of height $H$ and width $W$ can be represented as a tensor $(X^{\mu})_{mn}^{\alpha}$ with the indices $m \in [0, H-1], n\in [0, W-1]$ indicating pixel coordinates, $\alpha \in \{\text{R},\text{G}, \text{B}\}$ the color channel, and $\mu$ the selected sample.
+A set of $N$ digital images $\{X^{\mu}\}_{\mu\in\{1,\dots N\}}$ of height $H$ and width $W$ can be represented as a tensor $(X^{\mu})_{mn}^{\alpha}$ with the indices $m \in [0, H-1], n\in [0, W-1]$ indicating pixel coordinates, $\alpha \in \{\text{R},\text{G}, \text{B}\}$ the color channel, and $\mu$ the selected sample.
 
 The convolution operation of this tensor with the four-dimensional kernel $f^{\alpha\beta}_{ij}$ of size $h\times w$, $D$ features and $C$ output channels, is defined as:
 
-$$Y_{mn}^{\beta} = (X \circledast f)_{\,mn}^{\beta} = \sum_{a}$$
+$$
+(Y^{\beta})_{mn} = (X \circledast f)^{\beta}_{mn} = \sum_{\alpha} \sum_{i,j} f_{ij}^{\alpha\beta}\,(X^{\mu})_{m+i, n+j}^{\alpha}
+$$
 
-with: $i\in[0, h-1]$, $j \in [0,w-1]$, $\beta\in[0,D-1]$.
+with: $i\in[0, h-1]$, $j \in [0,w-1]$, $\beta\in[0,D-1]$
 
 Given a loss function $\mathcal{L}$ evaluated on the output of a convolution layer $(Y^{\alpha})_{kl}$, its derivative with respect to the convolution's input $(X^{\mu})_{mn}^{\alpha}$ and weights $f_{ij}^{\alpha\beta}$ is found to be:
 
